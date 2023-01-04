@@ -1,0 +1,3 @@
+'\\WSL$\UBUNTU-20.04\projects\os_project\backend\public'
+CMD.EXE foi iniciado tendo o caminho acima como pasta atual.
+Não há suporte para caminhos UNC. Padronizando para pasta do Windows.
