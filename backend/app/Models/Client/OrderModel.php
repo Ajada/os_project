@@ -12,7 +12,13 @@ class OrderModel extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        '',
+        'main_contact',
+        'secondary_contact',
+        'plate',
+        'car_model',
+        'state',
+        'problem_related',
+        'problem_found',
     ];
 
     

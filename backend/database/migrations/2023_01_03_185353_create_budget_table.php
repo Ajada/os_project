@@ -14,8 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::create('budget', function (Blueprint $table) {
-            $table->unsignedBigInteger('id')->index()->nullable();
-            $table->foreign('id')->references('id')->on('orders');
+            $table->id();
             $table->timestamps();
         });
     }
@@ -27,10 +26,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('budget', function (Blueprint $table) {
-            $table->dropForeign(['id']);
-        });
-
         Schema::dropIfExists('budget');
     }
 };

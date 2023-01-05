@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Register;
 use App\Http\Controllers\Controller;
 use App\Models\Automobile;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 
 class AutomobilesController extends Controller
 {
@@ -18,7 +18,7 @@ class AutomobilesController extends Controller
 
     public function index()
     {
-        
+        return response()->json($this->auto->all());
     }
 
     /**
@@ -28,11 +28,12 @@ class AutomobilesController extends Controller
      */
     public function store(Request $request)
     {
+        if($this->show($request->plate))
+            return response()->json(['error' => 'record already exists']);
+
         $register = $this->auto::create($request->all());
 
-        return $register ? 
-            response()->json(['success' => 'automobile registered with success']) : 
-            response()->json(['error' => true]);
+        return $register ? response()->json(['success' => 'automobile registered with success']) : response()->json(['error' => true]);
     }
 
     /**
@@ -43,7 +44,10 @@ class AutomobilesController extends Controller
      */
     public function show($param)
     {
-        //
+        $auto = DB::table('automobiles')
+            ->wherePlate($param)
+                ->first();
+        return $auto ? response()->json($auto) : false;
     }
 
     /**

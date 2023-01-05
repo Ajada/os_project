@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -28,11 +29,15 @@ class OrderController extends Controller
      */
     public function store(Request $request)  // recebe os dados dos clientes que estão entrnaod para manutenções
     {
-        $create_order = $this->order::created($request->all());
+        dd($request);
+        $auto_description = DB::table('automobiles')
+            ->wherePlate($request->plate)
+                ->get('car_model');
+        
+        $data = $request->all();
+        $auto_description ? $data['car_model'] = $auto_description[0]->car_model : '';
 
-        //validar se carro ja esta registrado show
-
-        return $create_order ?
+        return $this->order::create($data) ?
             response()->json(['success' => 'order created']) :
             response()->json(['error' => 'something went wrong creating record']);
     }
