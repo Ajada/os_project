@@ -2,6 +2,7 @@
 
 namespace App\Models\Client;
 
+use App\Models\Automobile;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,6 +13,7 @@ class OrderModel extends Model
     protected $table = 'orders';
 
     protected $fillable = [
+        'user_id',
         'main_contact',
         'secondary_contact',
         'plate',
@@ -21,6 +23,15 @@ class OrderModel extends Model
         'problem_found',
     ];
 
-    
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
 
+    protected $primaryKey = 'user_id';
+
+    public function automobile () 
+    {
+        return $this->hasMany(Automobile::class, 'user_id', 'user_id');
+    }
 }

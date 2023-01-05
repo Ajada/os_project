@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
+use App\Models\Automobile;
 use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use Illuminate\Support\Facades\DB;
@@ -10,15 +11,17 @@ use Illuminate\Support\Facades\DB;
 class OrderController extends Controller
 {
     protected $order;
-    
-    public function __construct(OrderModel $order)
+    protected $request;
+
+    public function __construct(OrderModel $order, Request $request)
     {
+        $this->request = $request;
         return $this->order = $order;
     }
 
     public function index()
-    {
-        dd('index');
+    {   
+        return $this->order::whereUserId($this->request->user_id)->get();
     }
 
     /**
@@ -27,19 +30,17 @@ class OrderController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)  // recebe os dados dos clientes que estão entrnaod para manutenções
+    public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
     {
-        dd($request);
-        $auto_description = DB::table('automobiles')
-            ->wherePlate($request->plate)
-                ->get('car_model');
-        
-        $data = $request->all();
-        $auto_description ? $data['car_model'] = $auto_description[0]->car_model : '';
+        try {
+            $auto = OrderModel::find($this->request->user_id)->automobile[0]::where('plate', $this->request->plate)->first();
+            if($auto)
+                $this->request['car_model'] = $auto->car_model;
+        } catch (\Throwable $th) {
+            $auto = $th;
+        }
 
-        return $this->order::create($data) ?
-            response()->json(['success' => 'order created']) :
-            response()->json(['error' => 'something went wrong creating record']);
+        return $this->order::create($this->request->all()) ? response()->json(['success' => 'order created']) : response()->json(['error' => 'something went wrong creating record']);
     }
 
     /**
@@ -60,9 +61,18 @@ class OrderController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        //
+        try {
+            if($this->order::whereId($id)->where('user_id', $this->request->user_id)->get()[0])
+                foreach ($this->request->all() as $key => $value) {
+                    if(!is_null($value))
+                        $this->order::whereId($id)->update([$key => $value]);
+                }
+            return response()->json(['success' => 'items updated successfully']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => true, 'description' => $th ? '' : '']);
+        }
     }
 
     /**

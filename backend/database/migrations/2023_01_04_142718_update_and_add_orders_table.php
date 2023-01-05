@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::table('orders', function (Blueprint $table) {
             $table->dropColumn('client_name');
             $table->dropColumn('cpf');
-            $table->string('main_contact')->after('id');
+            $table->string('main_contact')->after('user_id');
             $table->string('secondary_contact')->default('not informed')->after('main_contact')->nullable();
         });
     }
@@ -30,7 +30,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->dropColumn(['main_contact', 'secondary_contact']);
-            $table->string('client_name')->after('id');
+            $table->string('client_name')->after('user_id');
             $table->string('cpf')->after('client_name');
         });
     }

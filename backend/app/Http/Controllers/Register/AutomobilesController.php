@@ -33,7 +33,7 @@ class AutomobilesController extends Controller
 
         $register = $this->auto::create($request->all());
 
-        return $register ? response()->json(['success' => 'automobile registered with success']) : response()->json(['error' => true]);
+        return $register ? response()->json(['success' => $request->car_model.' registered with success']) : response()->json(['error' => true]);
     }
 
     /**

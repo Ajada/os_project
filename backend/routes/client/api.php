@@ -9,4 +9,5 @@ Route::controller(OrderController::class)
     ->group(function () {
         Route::post('/create-order', 'store');
         Route::get('/get-orders', 'index');
+        Route::put('/order/{id}/update', 'update');
     });

@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->unsignedBigInteger('user_id')->after('id')->index()->nullable();
+            $table->integer('id')->first()->autoIncrement();
         });
     }
 
@@ -25,8 +25,8 @@ return new class extends Migration
      */
     public function down()
     {
-        // Schema::table('orders', function(Blueprint $table) {
-        //     $table->dropForeign(['user_id']);
-        // });
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropColumn('id');
+        });
     }
 };
