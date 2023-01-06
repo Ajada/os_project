@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use Illuminate\Support\Facades\DB;
 
+use function GuzzleHttp\Promise\each;
+
 class OrderController extends Controller
 {
     protected $order;
@@ -83,6 +85,8 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return $this->order::whereId($id)->whereUserId($this->request->user_id)->delete() ? 
+            response()->json(['success' => 'record was been deleted successfull']) : 
+            response()->json(['error' => 'error deleting item']);
     }
 }
