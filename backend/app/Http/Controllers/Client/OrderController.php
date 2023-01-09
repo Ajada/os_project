@@ -17,8 +17,7 @@ class OrderController extends Controller
 
     public function __construct(OrderModel $order, Request $request)
     {
-        $this->request = $request;
-        return $this->order = $order;
+        return [$this->order = $order, $this->request = $request];
     }
 
     public function index()
@@ -31,8 +30,8 @@ class OrderController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-     */
-    public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
+        */
+        public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
     {
         try {
             $auto = OrderModel::find($this->request->user_id)->automobile[0]::where('plate', $this->request->plate)->first();
@@ -42,7 +41,9 @@ class OrderController extends Controller
             $auto = $th;
         }
 
-        return $this->order::create($this->request->all()) ? response()->json(['success' => 'order created']) : response()->json(['error' => 'something went wrong creating record']);
+        return $this->order::create($this->request->all()) ?
+            response()->json(['success' => 'order created']) : 
+            response()->json(['error' => 'something went wrong creating record']);
     }
 
     /**
@@ -53,7 +54,13 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        dd('show');
+        $order = $this->order::whereId($id)
+            ->where('user_id', $this->request->user_id)
+                ->first();
+
+        return $order ?
+            response()->json($order) : 
+            response()->json(['error' => 'no record found']);
     }
 
     /**
@@ -73,7 +80,7 @@ class OrderController extends Controller
                 }
             return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
-            return response()->json(['error' => true, 'description' => $th ? '' : '']);
+            return response()->json(['error' => true, 'description' => 'no order found with these parameters']);
         }
     }
 

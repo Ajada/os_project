@@ -3,9 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\ServiceModel;
 
 class ServiceController extends Controller
 {
+    protected $service;
+    protected $request;
+
+    public function __construct(ServiceModel $service, Request $request)
+    {
+        return [
+            $this->service = $service, 
+            $this->request = $request
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -22,9 +34,18 @@ class ServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
-        
+        try {
+            foreach ($this->request->all() as $key => $value) {
+                $key === 'service_description' ? 
+                    $this->service->create([$key => json_encode($value)]) : 
+                    $this->service->create([$key => $value]);
+            }
+            return response()->json(['success' => '']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => '']);
+        }
     }
 
     /**

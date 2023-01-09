@@ -10,4 +10,6 @@ Route::controller(AutomobilesController::class)
         Route::get('/collection', 'index');
         Route::post('/register', 'store');
         Route::get('/{param}/description', 'show');
+        Route::put('/{plate}/update', 'update');
+        Route::delete('/{id}/destroy-item', 'destroy');
     });

@@ -10,6 +10,7 @@ Route::controller(OrderController::class)
     ->group(function () {
         Route::post('/create-order', 'store');
         Route::get('/get-orders', 'index');
+        Route::get('/order/{id}/description', 'show');
         Route::put('/order/{id}/update', 'update');
         Route::delete('/destroy/{id}/order', 'destroy');
     });

@@ -13,10 +13,15 @@ class ServiceModel extends Model
     protected $table = 'services';
 
     protected $fillable = [
+        'id',
         'user_id',
         'responsible',
         'external_parts',
         'service_description',
+    ];
+
+    protected $cast = [
+        'service_description' => 'encrypted:object|encrypted:array|encrypted:collection',
     ];
 
     public function orders () 

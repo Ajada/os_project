@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\DB;
 class AutomobilesController extends Controller
 {
     protected $auto;
+    protected $request;
 
-    public function __construct(Automobile $automobile)
+    public function __construct(Automobile $automobile, Request $request)
     {
-        return $this->auto = $automobile;
+        return [$this->auto = $automobile, $this->request = $request];
     }
 
     public function index()
@@ -26,14 +27,20 @@ class AutomobilesController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
-        if($this->show($request->plate))
-            return response()->json(['error' => 'record already exists']);
+        try {
+            if(json_decode($this->show($this->request->plate)->content())->{'id'})
+                return response()->json([
+                    'error' => 'record already exists'
+                ]);
+        } catch (\Throwable $th) {
+            $th = $th; 
+        }
 
-        $register = $this->auto::create($request->all());
-
-        return $register ? response()->json(['success' => $request->car_model.' registered with success']) : response()->json(['error' => true]);
+        return $this->auto::create($this->request->all()) ? 
+            response()->json(['success' => $this->request->car_model.' registered with success']) : 
+            response()->json(['error' => 'something went wrong creating record']);
     }
 
     /**
@@ -47,7 +54,7 @@ class AutomobilesController extends Controller
         $auto = DB::table('automobiles')
             ->wherePlate($param)
                 ->first();
-        return $auto ? response()->json($auto) : false;
+        return $auto ? response()->json($auto) : response()->json(['error' => 'no record found']);
     }
 
     /**
@@ -57,9 +64,18 @@ class AutomobilesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        //
+        try {
+            if($this->auto::whereId($id)->where('user_id', $this->request->user_id)->get()[0])
+                foreach ($this->request->all() as $key => $value) {
+                    if(!is_null($value))
+                        $this->auto::whereId($id)->update([$key => $value]);
+                }
+            return response()->json(['success' => 'items updated successfully']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => true, 'description' => 'no automobile found with these parameters']);
+        }
     }
 
     /**
@@ -70,6 +86,8 @@ class AutomobilesController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return $this->auto::whereId($id)->whereUserId($this->request->user_id)->delete() ? 
+            response()->json(['success' => 'record was been deleted successfully']) : 
+            response()->json(['error' => 'error deleting item']);
     }
 }
