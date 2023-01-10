@@ -13,14 +13,13 @@ class OrderModel extends Model
     protected $table = 'orders';
 
     protected $fillable = [
-        'user_id',
+        'vehicle_id',
+        'mileage',
+        'client_name',
+        'cpf',
         'main_contact',
         'secondary_contact',
-        'plate',
-        'car_model',
-        'state',
         'problem_related',
-        'problem_found',
     ];
 
     protected $hidden = [
@@ -28,10 +27,8 @@ class OrderModel extends Model
         'updated_at',
     ];
 
-    protected $primaryKey = 'user_id';
-
     public function automobile () 
     {
-        return $this->hasMany(Automobile::class, 'user_id', 'user_id');
+        return $this->hasMany(Automobile::class, 'id');
     }
 }

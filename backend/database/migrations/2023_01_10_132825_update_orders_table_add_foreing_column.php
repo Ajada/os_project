@@ -13,9 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('budget', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->unsignedBigInteger('vehicle_id')->after('id')->nullable();
+            $table->foreign('vehicles_id')->references('id')->on('vehicles');
         });
     }
 
@@ -26,6 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('budget');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->dropForeign(['vehicles_id']);
+            $table->dropColumn('vehicles_id');
+        });
     }
 };

@@ -1,24 +1,23 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Client;
 
-use App\Models\Client\OrderModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ServiceModel extends Model
+class PartsModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'services';
+    protected $table = 'parts';
 
     protected $fillable = [
-        "order_id",
-        "description",
-        "status",
+        'order_id',
+        'description',
+        'amount',
     ];
 
-    public function orders () 
+    public function orders()
     {
         return $this->hasOne(OrderModel::class, 'id');
     }

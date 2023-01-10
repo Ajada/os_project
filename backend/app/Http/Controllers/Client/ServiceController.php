@@ -4,24 +4,29 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Client\OrderModel;
+use App\Models\ServiceModel;
 
-class OrderController extends Controller
+class ServiceController extends Controller
 {
-    protected $order;
+    protected $service;
     protected $request;
 
-    public function __construct(OrderModel $order, Request $request)
+    public function __construct(ServiceModel $service, Request $request)
     {
         return [
-            $this->order = $order, 
+            $this->service = $service, 
             $this->request = $request
         ];
     }
 
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function index()
-    {   
-        return $this->order->all();
+    {
+        return $this->service->all();
     }
 
     /**
@@ -29,14 +34,13 @@ class OrderController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
-        */
-    public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
+     */
+    public function store()
     {
-        // $this->order::find($this->request->vehicle_id)->automobile[0]->id
-
-        return $this->order::create($this->request->all()) ?
-            response()->json(['success' => 'order created']) : 
-            response()->json(['error' => 'something went wrong creating record']);
+        return 
+            $this->service->create($this->request->all()) ? 
+                response()->json(['success' => 'service created with successfully']) : 
+                response()->json(['error' => 'something went wrong creating record']);
     }
 
     /**
@@ -47,13 +51,12 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = $this->order::whereId($id)
-            ->where('user_id', $this->request->user_id)
-                ->first();
-
-        return $order ?
-            response()->json($order) : 
-            response()->json(['error' => 'no record found']);
+        $service = $this->service::whereId($id)
+            ->orWhere(function ($query) use ($id) {
+                $query->where('order_id', $id);
+            })->get();
+        
+        return $service ? response()->json($service) : response()->json(['error' => 'no record found']);
     }
 
     /**
@@ -66,14 +69,15 @@ class OrderController extends Controller
     public function update($id)
     {
         try {
-            if($this->order::whereId($id)->get()[0])
+            if($this->service::whereId($id)->get()[0]){
                 foreach ($this->request->all() as $key => $value) {
                     if(!is_null($value))
-                        $this->order::whereId($id)->update([$key => $value]);
+                        $this->service::whereId($id)->update([$key => $value]);
                 }
-            return response()->json(['success' => 'items updated successfully']);
+            }    
+            return response()->json(['success' => 'item updated successfully']);
         } catch (\Throwable $th) {
-            return response()->json(['error' => true, 'description' => 'no order found with these parameters']);
+            return response()->json(['error' => 'no order found with these parameters']);
         }
     }
 
@@ -85,7 +89,7 @@ class OrderController extends Controller
      */
     public function destroy($id)
     {
-        return $this->order::whereId($id)->delete() ? 
+        return $this->service::whereId($id)->delete() ? 
             response()->json(['success' => 'record was been deleted successfull']) : 
             response()->json(['error' => 'error deleting item']);
     }

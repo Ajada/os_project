@@ -13,8 +13,14 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->integer('id')->first()->autoIncrement();
+        Schema::create('vehicles', function (Blueprint $table) {
+            $table->id();
+            $table->string('brand')->nullable();
+            $table->string('model')->nullable();
+            $table->string('year')->nullable();
+            $table->string('plate');
+            $table->string('fuel_type')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('id');
-        });
+        Schema::dropIfExists('vehicles');
     }
 };

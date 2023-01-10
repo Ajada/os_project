@@ -17,8 +17,8 @@ class SetUserIdInRequest
      */
     public function handle(Request $request, Closure $next)
     {
-        if(is_null($request['user_id']))
-            $request['user_id'] = $this->getJWT($request->header('Authorization'));
+        // if(is_null($request['user_id']))
+        //     $request['user_id'] = $this->getJWT($request->header('Authorization'));
 
         return $next($request);
     }

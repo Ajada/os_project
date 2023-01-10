@@ -14,7 +14,10 @@ class AutomobilesController extends Controller
 
     public function __construct(Automobile $automobile, Request $request)
     {
-        return [$this->auto = $automobile, $this->request = $request];
+        return [
+            $this->auto = $automobile, 
+            $this->request = $request
+        ];
     }
 
     public function index()
@@ -39,7 +42,7 @@ class AutomobilesController extends Controller
         }
 
         return $this->auto::create($this->request->all()) ? 
-            response()->json(['success' => $this->request->car_model.' registered with success']) : 
+            response()->json(['success' => $this->request->model.' registered with success']) : 
             response()->json(['error' => 'something went wrong creating record']);
     }
 
@@ -51,7 +54,7 @@ class AutomobilesController extends Controller
      */
     public function show($param)
     {
-        $auto = DB::table('automobiles')
+        $auto = DB::table('vehicles')
             ->wherePlate($param)
                 ->first();
         return $auto ? response()->json($auto) : response()->json(['error' => 'no record found']);

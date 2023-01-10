@@ -14,15 +14,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->uuid('user_id')->index()->nullable();
-            $table->string('client_name');
-            $table->string('cpf');
-            $table->string('plate');
-            $table->string('car_model')->nullable();
-            $table->string('stats')->default('em avaliação'); 
-            //em avaliação //aguardando peça //aguardando mecânico //em execução //a faturar //pago //aguardando entrega //finalizado
+            $table->id();
+            $table->string('mileage')->nullable();
+            $table->string('client_name')->nullable();
+            $table->string('cpf')->nullable();
+            $table->string('main_contact')->nullable();
+            $table->string('secondary_contact')->nullable();
             $table->longText('problem_related');
-            $table->longText('problem_found');
             $table->timestamps();
         });
     }

@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Client;
 
+use App\Http\Controllers\Controller;
+use App\Models\Client\PartsModel;
 use Illuminate\Http\Request;
-use App\Models\ServiceModel;
 
-class ServiceController extends Controller
+class PartsController extends Controller
 {
-    protected $service;
+
+    protected $parts;
     protected $request;
 
-    public function __construct(ServiceModel $service, Request $request)
+    public function __construct(PartsModel $parts, Request $request)
     {
         return [
-            $this->service = $service, 
+            $this->parts = $parts,
             $this->request = $request
         ];
     }
@@ -25,7 +27,7 @@ class ServiceController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -34,18 +36,9 @@ class ServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
+    public function store(Request $request)
     {
-        try {
-            foreach ($this->request->all() as $key => $value) {
-                $key === 'service_description' ? 
-                    $this->service->create([$key => json_encode($value)]) : 
-                    $this->service->create([$key => $value]);
-            }
-            return response()->json(['success' => '']);
-        } catch (\Throwable $th) {
-            return response()->json(['error' => '']);
-        }
+        
     }
 
     /**

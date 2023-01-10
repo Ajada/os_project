@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Register\AutomobilesController;
 
 Route::controller(AutomobilesController::class)
-    ->prefix('v1/automobiles')
+    ->prefix('v1/vehicles')
     ->middleware('set.user_id')
     ->group(function () {
         Route::get('/collection', 'index');

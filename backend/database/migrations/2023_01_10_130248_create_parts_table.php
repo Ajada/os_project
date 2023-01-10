@@ -13,11 +13,10 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('automobiles', function (Blueprint $table) {
+        Schema::create('parts', function (Blueprint $table) {
             $table->id();
-            $table->string('car_model'); //modelo -> uno
-            $table->string('plate'); //placa
-            $table->string('brand'); //marca -> fiat
+            $table->longText('description');
+            $table->string('amount');
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('automobiles');
+        Schema::dropIfExists('parts');
     }
 };

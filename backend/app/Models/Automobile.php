@@ -10,13 +10,14 @@ class Automobile extends Model
 {
     use HasFactory;
 
-    protected $table = 'automobiles';
+    protected $table = 'vehicles';
 
     protected $fillable = [
-        'user_id',
-        'car_model',
-        'plate',
         'brand',
+        'model',
+        'year',
+        'plate',
+        'fuel_type',
     ];
 
     public function order () 

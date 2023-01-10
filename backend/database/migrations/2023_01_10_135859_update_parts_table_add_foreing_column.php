@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->string('cpf')->after('user_id')->nullable();
+        Schema::table('parts', function (Blueprint $table) {
+            $table->unsignedBigInteger('order_id')->after('id');
+            $table->foreign('order_id')->references('id')->on('orders');
         });
     }
 
@@ -25,8 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn('cpf');
+        Schema::table('parts', function (Blueprint $table) {
+            $table->dropForeign(['order_id']);
+            $table->dropColumn('order_id');
         });
     }
 };

@@ -7,19 +7,16 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     /**
+     * Run the migrations.
+     *
      * @return void
      */
     public function up()
     {
-        Schema::dropIfExists('automobiles');
-
-        Schema::create('vehicles', function (Blueprint $table) {
+        Schema::create('responsible_services', function (Blueprint $table) {
             $table->id();
-            $table->string('brand');
-            $table->string('model');
-            $table->string('year');
-            $table->string('plate');
-            $table->string('fuel_type');
+            $table->unsignedBigInteger('service_id');
+            $table->foreign('service_id')->references('id')->on('services');
             $table->timestamps();
         });
     }
@@ -31,6 +28,10 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vehicles');
+        Schema::table('responsible_services', function (Blueprint $table) {
+            $table->dropForeign(['service_id']);
+        });
+
+        Schema::dropIfExists('responsible_services');
     }
 };

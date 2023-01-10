@@ -14,12 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('services', function (Blueprint $table) {
-            $table->integer('id');
-            $table->uuid('user_id')->index()->nullable();
-            $table->foreign('id')->references('id')->on('orders');
-            $table->string('responsible')->nullable();
-            $table->boolean('external_parts')->nullable();
-            $table->longText('service_description'); // json com todos os dados\itens selecionados pelo mecanico
+            $table->id();
+            $table->unsignedBigInteger('order_id');
+            $table->foreign('order_id')->references('id')->on('orders');
+            $table->longText('description');
+            $table->string('status')->default('1');
             $table->timestamps();
         });
     }
@@ -32,9 +31,9 @@ return new class extends Migration
     public function down()
     {
         Schema::table('services', function (Blueprint $table) {
-            $table->dropForeign(['id']);
+            $table->dropForeign(['order_id']);
         });
-
+        
         Schema::dropIfExists('services');
     }
 };

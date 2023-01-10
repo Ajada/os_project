@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Client\OrderController;
-use App\Http\Controllers\ServiceController;
+use App\Http\Controllers\Client\ServiceController;
 use Illuminate\Support\Facades\Route;
 
 Route::controller(OrderController::class)
@@ -21,4 +21,6 @@ Route::controller(ServiceController::class)
     ->group(function () {
         // Route::get();
         Route::post('/register', 'store');
+        Route::put('/{id}/update', 'update');
+        Route::delete('/destroy/{id}/service', 'destroy');
     });
