@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class PartsController extends Controller
 {
-
     protected $parts;
     protected $request;
 
@@ -27,7 +26,7 @@ class PartsController extends Controller
      */
     public function index()
     {
-        
+        return response()->json($this->parts->all());
     }
 
     /**
@@ -36,9 +35,14 @@ class PartsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store()
     {
-        
+        try {
+            $this->parts->create($this->request->all());
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'something went wrong creating record']);
+        }
+        return response()->json(['success' => 'part successfully added']);
     }
 
     /**
@@ -49,7 +53,15 @@ class PartsController extends Controller
      */
     public function show($id)
     {
-        //
+        try {
+            $parts = $this->parts->whereOrderId($id)
+                ->orWhere(function ($query) use ($id) { 
+                    $query->whereId($id); 
+                })->get();
+            return isset($parts[0]) ? $parts : response()->json(['error' => 'used service parts not found']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'Throwable error']);
+        }
     }
 
     /**
@@ -59,9 +71,19 @@ class PartsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        //
+        try {
+            if($this->parts::whereId($id)->get()[0]){
+                foreach ($this->request->all() as $key => $value) {
+                    if(!is_null($value))
+                        $this->parts::whereId($id)->update([$key => $value]);
+                }
+            }    
+            return response()->json(['success' => 'parts updated successfully']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'no parts found with these parameters']);
+        }
     }
 
     /**
@@ -72,6 +94,8 @@ class PartsController extends Controller
      */
     public function destroy($id)
     {
-        //
+        return $this->parts::whereId($id)->delete() ? 
+            response()->json(['success' => 'part was been deleted successfully']) : 
+            response()->json(['error' => 'error deleting part']);
     }
 }

@@ -35,10 +35,12 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('api')
                 ->prefix('app')
+                ->middleware('cors')
                 ->group(base_path('routes/client/api.php'));
 
             Route::middleware('api')
                 ->prefix('app')
+                ->middleware('cors')
                 ->group(base_path('routes/client/automobile/api.php'));
 
             Route::middleware('web')

@@ -37,10 +37,12 @@ class ServiceController extends Controller
      */
     public function store()
     {
-        return 
-            $this->service->create($this->request->all()) ? 
-                response()->json(['success' => 'service created with successfully']) : 
-                response()->json(['error' => 'something went wrong creating record']);
+        try {
+            $this->service->create($this->request->all());
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'something went wrong creating record']);
+        }
+        return response()->json(['success' => 'service created with successfully']);
     }
 
     /**
@@ -55,8 +57,10 @@ class ServiceController extends Controller
             ->orWhere(function ($query) use ($id) {
                 $query->where('order_id', $id);
             })->get();
-        
-        return $service ? response()->json($service) : response()->json(['error' => 'no record found']);
+
+        return isset($service[0]) ?
+            response()->json($service) : 
+            response()->json(['error' => 'no record found']);
     }
 
     /**

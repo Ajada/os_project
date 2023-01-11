@@ -70,14 +70,14 @@ class AutomobilesController extends Controller
     public function update($id)
     {
         try {
-            if($this->auto::whereId($id)->where('user_id', $this->request->user_id)->get()[0])
+            if($this->auto::whereId($id)->get()[0])
                 foreach ($this->request->all() as $key => $value) {
                     if(!is_null($value))
                         $this->auto::whereId($id)->update([$key => $value]);
                 }
             return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
-            return response()->json(['error' => true, 'description' => 'no automobile found with these parameters']);
+            return response()->json(['error' => 'no automobile found with these parameters']);
         }
     }
 
@@ -89,7 +89,7 @@ class AutomobilesController extends Controller
      */
     public function destroy($id)
     {
-        return $this->auto::whereId($id)->whereUserId($this->request->user_id)->delete() ? 
+        return $this->auto::whereId($id)->delete() ? 
             response()->json(['success' => 'record was been deleted successfully']) : 
             response()->json(['error' => 'error deleting item']);
     }

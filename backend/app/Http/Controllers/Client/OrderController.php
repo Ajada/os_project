@@ -32,11 +32,12 @@ class OrderController extends Controller
         */
     public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
     {
-        // $this->order::find($this->request->vehicle_id)->automobile[0]->id
-
-        return $this->order::create($this->request->all()) ?
-            response()->json(['success' => 'order created']) : 
-            response()->json(['error' => 'something went wrong creating record']);
+        try {
+            $this->order::create($this->request->all());
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'something went wrong creating record']);
+        }
+        return response()->json(['success' => 'order created']);
     }
 
     /**
@@ -47,9 +48,7 @@ class OrderController extends Controller
      */
     public function show($id)
     {
-        $order = $this->order::whereId($id)
-            ->where('user_id', $this->request->user_id)
-                ->first();
+        $order = $this->order::whereId($id)->first();
 
         return $order ?
             response()->json($order) : 
@@ -73,7 +72,7 @@ class OrderController extends Controller
                 }
             return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
-            return response()->json(['error' => true, 'description' => 'no order found with these parameters']);
+            return response()->json(['error' => 'no order found with these parameters']);
         }
     }
 

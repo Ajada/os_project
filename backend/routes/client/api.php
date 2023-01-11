@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Client\OrderController;
+use App\Http\Controllers\Client\PartsController;
 use App\Http\Controllers\Client\ServiceController;
 use Illuminate\Support\Facades\Route;
 
@@ -19,8 +20,19 @@ Route::controller(ServiceController::class)
     ->prefix('v1/service')
     ->middleware('set.user_id')
     ->group(function () {
-        // Route::get();
+        Route::get('/get-collections', 'index');
+        Route::get('/get-item/{id}/collection', 'show');
         Route::post('/register', 'store');
         Route::put('/{id}/update', 'update');
         Route::delete('/destroy/{id}/service', 'destroy');
+    });
+
+Route::controller(PartsController::class)
+    ->prefix('v1/service-parts/')
+    ->group(function () {
+        Route::get('get-collection', 'index');
+        Route::post('add-parts', 'store');
+        Route::get('get-parts/{id}/service', 'show');
+        Route::put('{id}/update-part', 'update');
+        Route::delete('remove/{id}/part', 'destroy');
     });
