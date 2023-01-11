@@ -35,10 +35,10 @@ class ServiceController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
+    public function store($param)
     {
         try {
-            $this->service->create($this->request->all());
+            $this->service->create($param);
         } catch (\Throwable $th) {
             return response()->json(['error' => 'something went wrong creating record']);
         }

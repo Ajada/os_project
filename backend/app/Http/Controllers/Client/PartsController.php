@@ -35,12 +35,19 @@ class PartsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store()
+    public function store($param)
     {
         try {
-            $this->parts->create($this->request->all());
+            foreach ($param['description_parts'] as $key => $value) {
+                $this->parts->create([
+                    'order_id' => $param['order_id'],
+                    'description' => $value['part'],
+                    'amount' => $value['amount']
+                ]);
+            }
         } catch (\Throwable $th) {
-            return response()->json(['error' => 'something went wrong creating record']);
+            dd($th);
+            return response()->json(['error' => $th]);
         }
         return response()->json(['success' => 'part successfully added']);
     }

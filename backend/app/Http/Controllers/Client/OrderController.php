@@ -5,17 +5,24 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
+use App\Http\Controllers\Client\ServiceController;
+use App\Http\Controllers\Client\PartsController;
+use Symfony\Component\Mailer\Transport\Dsn;
 
 class OrderController extends Controller
 {
     protected $order;
     protected $request;
+    protected $service;
+    protected $parts;
 
-    public function __construct(OrderModel $order, Request $request)
+    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts)
     {
         return [
             $this->order = $order, 
-            $this->request = $request
+            $this->request = $request,
+            $this->service = $service,
+            $this->parts = $parts,
         ];
     }
 
@@ -24,28 +31,27 @@ class OrderController extends Controller
         return $this->order->all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-        */
     public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
     {
-        try {
-            $this->order::create($this->request->all());
-        } catch (\Throwable $th) {
-            return response()->json(['error' => 'something went wrong creating record']);
-        }
+        $order = $this->order::create($this->request->all());
+    
+        $service = $this->service->store([
+            'order_id' => $order->id,
+            'description' => $this->request->description,
+            'status' => '1'
+        ]);
+
+        $parts = $this->parts->store([
+            'order_id' => $order->id,
+            'description_parts' => $this->request->description_parts,
+        ]);
+        
+        if(isset(json_decode($service->content())->{'error'}) || isset(json_decode($parts->content())->{'error'}))
+            return response()->json(['error' => 'something went wrong adding parts or service']);
+
         return response()->json(['success' => 'order created']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
         $order = $this->order::whereId($id)->first();
@@ -55,13 +61,6 @@ class OrderController extends Controller
             response()->json(['error' => 'no record found']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update($id)
     {
         try {
@@ -76,12 +75,6 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         return $this->order::whereId($id)->delete() ? 
