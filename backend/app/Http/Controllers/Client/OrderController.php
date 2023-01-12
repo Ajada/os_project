@@ -28,46 +28,67 @@ class OrderController extends Controller
 
     public function index()
     {   
-        return $this->order->all();
+        $order = [];
+
+        foreach ($this->order->all() as $key => $value) {
+            $order[$key] = [
+                'order' => $value,
+                'services' => $this->service->index($value['id'])->original,
+                'parts' => $this->parts->index($value['id'])->original,
+            ];
+        }
+
+        return response()->json($order);
     }
 
-    public function store()  // recebe os dados dos clientes que estão entrnaod para manutenções
+    public function store()
     {
-        $order = $this->order::create($this->request->all());
-    
-        $service = $this->service->store([
-            'order_id' => $order->id,
-            'description' => $this->request->description,
-            'status' => '1'
-        ]);
+        try {
+            $order = $this->order::create($this->request->all());
 
-        $parts = $this->parts->store([
-            'order_id' => $order->id,
-            'description_parts' => $this->request->description_parts,
-        ]);
-        
-        if(isset(json_decode($service->content())->{'error'}) || isset(json_decode($parts->content())->{'error'}))
-            return response()->json(['error' => 'something went wrong adding parts or service']);
+            //update to observer
+            $service = $this->service->store(['order_id' => $order->id, 'service' => $this->request->service]);
+
+            $parts = $this->parts->store(['order_id' => $order->id, 'parts' => $this->request->parts]);
+            
+            if(isset(json_decode($service->content())->{'error'}) || isset(json_decode($parts->content())->{'error'}))
+                return response()->json(['error' => 'something went wrong adding parts or service']);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => 'vehicle not reported or not found']);
+        }
 
         return response()->json(['success' => 'order created']);
     }
 
     public function show($id)
     {
-        $order = $this->order::whereId($id)->first();
+        $order = [
+            'order' => $this->order::whereId($id)->first(),
+            'services' => $this->service->show($id)->original,
+            'parts' => $this->parts->show($id)->original,
+        ];
 
-        return $order ?
-            response()->json($order) : 
-            response()->json(['error' => 'no record found']);
+        return $order ? response()->json($order) : response()->json(['error' => 'no record found']);
     }
 
     public function update($id)
     {
+        if($this->order::whereId($id)->get()[0])
+            foreach ($this->request->all() as $key => $value) {
+                $key == 'service' ? $this->service->update($value) : '';
+                $key == 'parts' ? $this->parts->update($value) : '';
+                // $this->order::whereId($id)->update([$key => $value]);
+            }
+
+        dd();
+
         try {
             if($this->order::whereId($id)->get()[0])
                 foreach ($this->request->all() as $key => $value) {
                     if(!is_null($value))
-                        $this->order::whereId($id)->update([$key => $value]);
+                        dd($value->service[0]['description']);
+                        // $this service parts
+                        // $this->order::whereId($id)->update([$key => $value]);
                 }
             return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
@@ -77,8 +98,19 @@ class OrderController extends Controller
 
     public function destroy($id)
     {
-        return $this->order::whereId($id)->delete() ? 
-            response()->json(['success' => 'record was been deleted successfull']) : 
-            response()->json(['error' => 'error deleting item']);
+        if(!$this->order->whereId($id)->first())
+            return response()->json(['error' => 'record not found']);
+        
+        $this->service->destroy($id);
+        $this->parts->destroy($id);
+        $this->order::whereId($id)->delete();
+
+        return response()->json(['success' => 'record was been deleted successfull']);
     }
+
+    public function deleteServiceAndParts()
+    {
+
+    }
+
 }

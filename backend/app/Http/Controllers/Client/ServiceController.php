@@ -19,70 +19,53 @@ class ServiceController extends Controller
         ];
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
+    public function index($id)
     {
-        return $this->service->all();
+        return response()->json($this->service->whereOrderId($id)->get());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store($param)
+    public function store($order)
     {
         try {
-            $this->service->create($param);
+            foreach ($order['service'] as $key => $value) {
+                $this->service->create([
+                    'order_id' => $order['order_id'] ,
+                    'description' => $value['description'],
+                    'status' => $value['status']
+                ]);
+            }
         } catch (\Throwable $th) {
             return response()->json(['error' => 'something went wrong creating record']);
         }
         return response()->json(['success' => 'service created with successfully']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($id)
     {
-        $service = $this->service::whereId($id)
-            ->orWhere(function ($query) use ($id) {
-                $query->where('order_id', $id);
-            })->get();
+        $service = $this->service::whereOrderId($id)->get();
 
         return isset($service[0]) ?
             response()->json($service) : 
-            response()->json(['error' => 'no record found']);
+            response()->json(['There are no registered services for this vehicle.']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update($id)
+    public function update($service)
     {
         try {
-            if($this->service::whereId($id)->get()[0]){
-                foreach ($this->request->all() as $key => $value) {
-                    if(!is_null($value))
-                        $this->service::whereId($id)->update([$key => $value]);
-                }
-            }    
-            return response()->json(['success' => 'item updated successfully']);
+            foreach ($service as $key => $value) {
+                $reg = $this->service->whereId($service[$key]['id']);
+                if(isset($reg->first()->id))
+                    return response()->json('teste'); // return 500 
+                    // $reg->update([
+                    //     'description' => is_null($value['description']) ? $reg->first()->description : $value['description'],
+                    //     'status' => is_null($value['status']) ? $reg->first()->status : $value['status'],
+                    // ]);
+            }
         } catch (\Throwable $th) {
-            return response()->json(['error' => 'no order found with these parameters']);
+            dd($th);
         }
+        
+        return response()->json(['success' => 'services updated successfully']);
     }
 
     /**
@@ -93,8 +76,16 @@ class ServiceController extends Controller
      */
     public function destroy($id)
     {
-        return $this->service::whereId($id)->delete() ? 
+        return $this->service::whereOrderId($id)->delete() ? 
             response()->json(['success' => 'record was been deleted successfull']) : 
             response()->json(['error' => 'error deleting item']);
     }
+
+    public function destroyOneService($id)
+    {
+        return $this->service::whereId($id)->delete() ? 
+            response()->json(['success' => 'service has been deleted successfull']) : 
+            response()->json(['error' => 'error deleting item']);
+    }
+
 }

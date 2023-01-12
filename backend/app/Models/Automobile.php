@@ -20,6 +20,11 @@ class Automobile extends Model
         'fuel_type',
     ];
 
+    protected $hidden = [
+        'created_at',
+        'updated_at',
+    ];
+
     public function order () 
     {
         return $this->belongsTo(OrderModel::class, 'user_id');
