@@ -51,29 +51,16 @@ class ServiceController extends Controller
 
     public function update($service)
     {
-        try {
-            foreach ($service as $key => $value) {
-                $reg = $this->service->whereId($service[$key]['id']);
-                if(isset($reg->first()->id))
-                    return response()->json('teste'); // return 500 
-                    // $reg->update([
-                    //     'description' => is_null($value['description']) ? $reg->first()->description : $value['description'],
-                    //     'status' => is_null($value['status']) ? $reg->first()->status : $value['status'],
-                    // ]);
-            }
-        } catch (\Throwable $th) {
-            dd($th);
+        foreach ($service as $key => $value) {
+            $reg = $this->service->whereId($service[$key]['id']);
+            if(isset($reg->first()->id))
+                $reg->update([
+                    'description' => is_null($value['description']) ? $reg->first()->description : $value['description'],
+                    'status' => is_null($value['status']) ? $reg->first()->status : $value['status'],
+                ]);
         }
-        
-        return response()->json(['success' => 'services updated successfully']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         return $this->service::whereOrderId($id)->delete() ? 
@@ -81,11 +68,11 @@ class ServiceController extends Controller
             response()->json(['error' => 'error deleting item']);
     }
 
-    public function destroyOneService($id)
+    public function destroyOneService($serviceId)
     {
-        return $this->service::whereId($id)->delete() ? 
-            response()->json(['success' => 'service has been deleted successfull']) : 
-            response()->json(['error' => 'error deleting item']);
+        foreach ($serviceId as $key => $value) {
+            $this->service::whereId($value['id'])->delete();
+        }
     }
 
 }

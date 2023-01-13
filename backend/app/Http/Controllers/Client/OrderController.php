@@ -46,7 +46,6 @@ class OrderController extends Controller
         try {
             $order = $this->order::create($this->request->all());
 
-            //update to observer
             $service = $this->service->store(['order_id' => $order->id, 'service' => $this->request->service]);
 
             $parts = $this->parts->store(['order_id' => $order->id, 'parts' => $this->request->parts]);
@@ -58,6 +57,23 @@ class OrderController extends Controller
         }
 
         return response()->json(['success' => 'order created']);
+    }
+
+    public function addItemToOrder($id)
+    {
+        $service = $this->service->store([
+            'order_id' => $id, 
+            'service' => $this->request->service
+        ]);
+    
+        $parts = $this->parts->store([
+            'order_id' => $id, 
+            'parts' => $this->request->parts
+        ]);
+
+        return !$service || !$parts ? 
+            response()->json(['error' => 'something went wrong creating record']) : 
+            response()->json(['success' => 'items added to order']);
     }
 
     public function show($id)
@@ -73,22 +89,14 @@ class OrderController extends Controller
 
     public function update($id)
     {
-        if($this->order::whereId($id)->get()[0])
-            foreach ($this->request->all() as $key => $value) {
-                $key == 'service' ? $this->service->update($value) : '';
-                $key == 'parts' ? $this->parts->update($value) : '';
-                // $this->order::whereId($id)->update([$key => $value]);
-            }
-
-        dd();
-
         try {
             if($this->order::whereId($id)->get()[0])
                 foreach ($this->request->all() as $key => $value) {
-                    if(!is_null($value))
-                        dd($value->service[0]['description']);
-                        // $this service parts
-                        // $this->order::whereId($id)->update([$key => $value]);
+                    $key == 'service' ? $this->service->update($value) : '';
+                    $key == 'parts' ? $this->parts->update($value) : '';
+                    $key == 'service' || $key == 'parts' ? '' : 
+                        $this->order::whereId($id)->update([
+                            $key => $value ? $value : $this->order::whereId($id)->get()[0]->$key]);
                 }
             return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
@@ -105,12 +113,15 @@ class OrderController extends Controller
         $this->parts->destroy($id);
         $this->order::whereId($id)->delete();
 
-        return response()->json(['success' => 'record was been deleted successfull']);
+        return response()->json(['success' => 'record was been deleted successfully']);
     }
 
     public function deleteServiceAndParts()
     {
-
+        return $this->service->destroyOneService($this->request->all()['service']) &&
+            $this->service->destroyOnePart($this->request->all()['parts']) ?
+                response()->json(['success' => 'items deleted with successfully']) : 
+                response()->json(['error' => 'something went wrong while removing items']);
     }
 
 }

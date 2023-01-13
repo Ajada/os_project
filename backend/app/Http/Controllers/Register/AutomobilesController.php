@@ -25,11 +25,6 @@ class AutomobilesController extends Controller
         return response()->json($this->auto->all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store()
     {
         try {
@@ -46,12 +41,6 @@ class AutomobilesController extends Controller
             response()->json(['error' => 'something went wrong creating record']);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function show($param)
     {
         $auto = DB::table('vehicles')
@@ -60,13 +49,6 @@ class AutomobilesController extends Controller
         return $auto ? response()->json($auto) : response()->json(['error' => 'no record found']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update($id)
     {
         try {
@@ -81,12 +63,6 @@ class AutomobilesController extends Controller
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function destroy($id)
     {
         return $this->auto::whereId($id)->delete() ? 
