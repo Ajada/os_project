@@ -26,6 +26,11 @@ class OrderController extends Controller
         ];
     }
 
+    public function tes() 
+    {
+        $tes = auth()->attempt();
+    }
+
     public function index()
     {   
         $order = [];
