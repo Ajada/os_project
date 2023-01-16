@@ -7,7 +7,8 @@ use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use App\Http\Controllers\Client\ServiceController;
 use App\Http\Controllers\Client\PartsController;
-use Symfony\Component\Mailer\Transport\Dsn;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -26,9 +27,21 @@ class OrderController extends Controller
         ];
     }
 
-    public function tes() 
+    public function authTeste() 
     {
-        $tes = auth()->attempt();
+        $db = config(['database.connections.tenant.database' => 'teste_schema']);
+        
+        dd($db);
+
+        config()['database']['connections']['tenant']['database'] = 'tenant_teste';
+
+        $table = config()['database']['connections']['tenant']['database'];
+
+        dd($table);
+
+        dd(config()['database']['connections']['tenant']['database']);
+        $users = DB::connection('tenant')->table('teste')->get();
+        dd($users);
     }
 
     public function index()
