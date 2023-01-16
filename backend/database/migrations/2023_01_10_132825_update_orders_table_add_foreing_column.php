@@ -15,7 +15,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
             $table->unsignedBigInteger('vehicle_id')->after('id')->nullable();
-            $table->foreign('vehicles_id')->references('id')->on('vehicles');
+            $table->foreign('vehicle_id')->references('id')->on('vehicles');
         });
     }
 
@@ -27,8 +27,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropForeign(['vehicles_id']);
-            $table->dropColumn('vehicles_id');
+            $table->dropForeign(['vehicle_id']);
+            $table->dropColumn('vehicle_id');
         });
     }
 };
