@@ -31,7 +31,8 @@ return new class extends Migration
     public function down()
     {
         Schema::table('history_vehicle_io', function (Blueprint $table) {
-            $table->dropForeign(['order_id', 'vehicle_id']);
+            $table->dropForeign(['order_id']);
+            $table->dropForeign(['vehicle_id']);
         });
 
         Schema::dropIfExists('history_vehicle_io');

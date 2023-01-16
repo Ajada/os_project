@@ -5,16 +5,15 @@ use Illuminate\Support\Facades\Route;
 
 Route::controller(OrderController::class)
     ->prefix('v1/client/')
-    ->middleware('set.user_id')
     ->group(function () {
-        Route::post('create-order', 'store');
-        Route::post('include-to/{id}/order', 'addItemToOrder');
+        Route::post('create', 'store');
+        Route::post('include/{id}', 'addItemToOrder');
         
-        Route::get('get-orders', 'index');
-        Route::get('order/{id}/description', 'show');
+        Route::get('collection', 'index');
+        Route::get('{id}', 'show');
         
-        Route::put('order/{id}/update', 'update');
+        Route::put('{id}', 'update');
         
-        Route::delete('destroy/{id}/order', 'destroy');
-        Route::delete('destroy-items/order', 'deleteServiceAndParts');
+        Route::delete('{id}', 'destroy');
+        Route::delete('items', 'deleteServiceAndParts');
     });

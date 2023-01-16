@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('mileage')->nullable();
             $table->string('client_name')->nullable();
             $table->string('cpf')->nullable();
-            $table->string('main_contact')->nullable();
-            $table->string('secondary_contact')->nullable();
+            $table->string('name_main_contact')->nullable();
+            $table->string('number_main_contact')->nullable();
+            $table->string('name_secondary_contact')->nullable();
+            $table->string('number_secondary_contact')->nullable();
             $table->longText('problem_related');
             $table->timestamps();
         });
