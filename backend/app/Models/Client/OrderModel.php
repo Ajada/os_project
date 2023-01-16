@@ -17,8 +17,10 @@ class OrderModel extends Model
         'mileage',
         'client_name',
         'cpf',
-        'main_contact',
-        'secondary_contact',
+        'name_main_contact',
+        'number_main_contact',
+        'name_secondary_contact',
+        'number_secondary_contact',
         'problem_related',
     ];
 

@@ -17,6 +17,12 @@ class PartsModel extends Model
         'amount',
     ];
 
+    protected $hidden = [
+        'order_id',
+        'created_at',
+        'updated_at',
+    ];
+
     public function orders()
     {
         return $this->hasOne(OrderModel::class, 'id');
