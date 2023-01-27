@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-use App\Http\Middleware\SetUserIdInRequest;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 
 class Kernel extends HttpKernel
@@ -66,6 +65,8 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'cors' => \App\Http\Middleware\CorsMiddleware::class,
-        'jwt.verify' => \App\Http\Middleware\SetUserIdInRequest::class,
+        'jwt.verify' => \App\Http\Middleware\Auth\VerifyJWT::class,
+        'tenant.id' => \App\Http\Middleware\Auth\GetTenantId::class,
+        'set.tenant' => \App\Http\Middleware\Auth\SetTenantId::class,
     ];
 }

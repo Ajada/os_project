@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Middleware\Auth;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -10,7 +10,7 @@ use Lcobucci\JWT\Token\InvalidTokenStructure;
 use Lcobucci\JWT\Token\Parser;
 use Lcobucci\JWT\Token\UnsupportedHeaderFound;
 
-class SetUserIdInRequest
+class VerifyJWT
 {
     /**
      * Handle an incoming request.
@@ -24,19 +24,19 @@ class SetUserIdInRequest
         $parser = new Parser(new JoseEncoder);
 
         try {
-            $token = $parser->parse(substr($request->header('authorization'), 7, strlen($request->header('authorization'))));
+            $parser->parse(
+                substr(
+                    $request->header('authorization'),
+                    7,
+                    strlen($request->header('authorization'))
+                )
+            );
         } catch (CannotDecodeContent | InvalidTokenStructure | UnsupportedHeaderFound $e) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            return response()->json([
+                'error' => 'Unauthorized'
+            ], 401);
         }
 
-        // $this->getSchema($request->header('authorization'));
-
         return $next($request);
-    }
-
-    protected function getSchema($req)
-    {
-        $header = explode('.' ,$req);
-        return $header[0] ? json_decode(base64_decode($header[1]))->{'sub'}->{'id'} : null;
     }
 }

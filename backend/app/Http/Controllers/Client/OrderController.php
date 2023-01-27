@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use App\Http\Controllers\Client\ServiceController;
 use App\Http\Controllers\Client\PartsController;
+use App\Models\Manager\PublicModel;
 
 class OrderController extends Controller
 {
@@ -14,20 +15,22 @@ class OrderController extends Controller
     protected $request;
     protected $service;
     protected $parts;
+    protected $public;
 
-    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts)
+    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts, PublicModel $public)
     {
         return [
             $this->order = $order, 
             $this->request = $request,
             $this->service = $service,
             $this->parts = $parts,
+            $this->public = $public,
         ];
     }
 
     public function authTeste() 
     {
-        dd('authTeste');
+        dd($this->request->all());
     }
 
     public function index()
