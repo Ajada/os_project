@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Client;
 
-use App\Models\Client\OrderModel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Automobile extends Model
+class VehicleModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'vehicles';
+    public $table = 'vehicles';
 
     protected $fillable = [
         'brand',
@@ -29,5 +28,4 @@ class Automobile extends Model
     {
         return $this->belongsTo(OrderModel::class, 'user_id');
     }
-
 }

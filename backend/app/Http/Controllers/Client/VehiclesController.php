@@ -1,23 +1,28 @@
 <?php
 
-namespace App\Http\Controllers\Register;
+namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
-use App\Models\Automobile;
+use App\Models\Client\VehicleModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AutomobilesController extends Controller
+class VehiclesController extends Controller
 {
     protected $auto;
     protected $request;
 
-    public function __construct(Automobile $automobile, Request $request)
+    public function __construct(VehicleModel $automobile, Request $request)
     {
         return [
             $this->auto = $automobile, 
             $this->request = $request
         ];
+    }
+
+    public function defineTable()
+    {
+        return $this->auto->setTable('client_1.vehicles');
     }
 
     public function index()
@@ -27,6 +32,7 @@ class AutomobilesController extends Controller
 
     public function store()
     {
+        $this->setTable();
         try {
             if(json_decode($this->show($this->request->plate)->content())->{'id'})
                 return response()->json([
@@ -43,6 +49,7 @@ class AutomobilesController extends Controller
 
     public function show($param)
     {
+        $this->setTable();
         $auto = DB::table('vehicles')
             ->wherePlate($param)
                 ->first();
@@ -51,6 +58,7 @@ class AutomobilesController extends Controller
 
     public function update($id)
     {
+        $this->setTable();
         try {
             if($this->auto::whereId($id)->get()[0])
                 foreach ($this->request->all() as $key => $value) {
@@ -65,6 +73,7 @@ class AutomobilesController extends Controller
 
     public function destroy($id)
     {
+        $this->setTable();
         return $this->auto::whereId($id)->delete() ? 
             response()->json(['success' => 'record was been deleted successfully'], 200) : 
             response()->json(['error' => 'error deleting item'], 409);

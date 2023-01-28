@@ -1,9 +1,9 @@
 <?php
 
+use App\Http\Controllers\Client\VehiclesController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Register\AutomobilesController;
 
-Route::controller(AutomobilesController::class)
+Route::controller(VehiclesController::class)
     ->prefix('v1/vehicles')
     ->group(function () {
         Route::get('/collection', 'index');

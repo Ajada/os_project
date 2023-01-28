@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use App\Http\Controllers\Client\ServiceController;
 use App\Http\Controllers\Client\PartsController;
-use App\Models\Manager\PublicModel;
 
 class OrderController extends Controller
 {
@@ -17,24 +16,29 @@ class OrderController extends Controller
     protected $parts;
     protected $public;
 
-    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts, PublicModel $public)
+    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts)
     {
         return [
-            $this->order = $order, 
+            $this->order = $order,
             $this->request = $request,
             $this->service = $service,
             $this->parts = $parts,
-            $this->public = $public,
         ];
     }
-
+    
+    protected function setTable()
+    {
+        return $this->order->table = $this->request->tenant_id.'.'.$this->order->table;
+    }
+    
     public function authTeste() 
     {
-        dd($this->request->all());
+        dd($this->setTable());
     }
 
     public function index()
     {   
+        $this->setTable();
         $order = [];
 
         foreach ($this->order->all() as $key => $value) {
@@ -50,6 +54,7 @@ class OrderController extends Controller
 
     public function store()
     {
+        $this->setTable();
         try {
             $order = $this->order::create($this->request->all());
 
@@ -74,6 +79,7 @@ class OrderController extends Controller
 
     public function addItemToOrder($id)
     {
+        $this->setTable();
         $service = $this->service->store([
             'order_id' => $id, 
             'service' => $this->request->service
@@ -91,6 +97,7 @@ class OrderController extends Controller
 
     public function show($id)
     {
+        $this->setTable();
         $order = [
             'order' => $this->order::whereId($id)->first(),
             'services' => $this->service->show($id)->original,
@@ -102,6 +109,7 @@ class OrderController extends Controller
 
     public function update($id)
     {
+        $this->setTable();
         try {
             if($this->order::whereId($id)->get()[0])
                 foreach ($this->request->all() as $key => $value) {
@@ -119,6 +127,7 @@ class OrderController extends Controller
 
     public function destroy($id)
     {
+        $this->setTable();
         if(!$this->order->whereId($id)->first())
             return response()->json(['error' => 'record not found'], 404);
         
@@ -131,6 +140,7 @@ class OrderController extends Controller
 
     public function deleteServiceAndParts()
     {
+        $this->setTable();
         return $this->service->destroyOneService($this->request->all()['service']) &&
             $this->service->destroyOnePart($this->request->all()['parts']) ?
                 response()->json(['success' => 'items deleted with successfully'], 200) : 
