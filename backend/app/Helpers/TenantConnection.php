@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\DB;
 
 class TenantConnection
 {
+    protected static string $host;
+
     protected static function reconnect($tenantConnection)
     {
         DB::purge('pgsql');
@@ -14,7 +16,7 @@ class TenantConnection
         $tenant = self::verifyHost($tenantConnection);
 
         if(is_null($tenant))
-            return response()->json(['error' => 'tenant not found'], 401);
+            die(json_encode(['error' => 'tenant not found']));
 
         config([
             'database.connections.pgsql.schema' => $tenant->host,
@@ -23,6 +25,8 @@ class TenantConnection
         
         DB::connection('pgsql');
 
+        self::$host = $tenant->host;
+
         return $tenant;
     }
 
@@ -30,4 +34,5 @@ class TenantConnection
     {
         return PublicModel::where('tenant_id', $host)->first();
     }
+
 }

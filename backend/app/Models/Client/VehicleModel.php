@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class VehicleModel extends Model
 {
     use HasFactory;
+    
+    public $table = 'client_2.vehicles';
 
-    public $table = 'vehicles';
-
-    protected $fillable = [
+    public $fillable = [
         'brand',
         'model',
         'year',
@@ -23,6 +23,11 @@ class VehicleModel extends Model
         'created_at',
         'updated_at',
     ];
+    
+    // public function setDefaultConenction($connect)
+    // {
+    //     $this->connection = $connect;
+    // }
 
     public function order () 
     {

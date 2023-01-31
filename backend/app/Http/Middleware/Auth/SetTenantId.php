@@ -17,14 +17,12 @@ class SetTenantId
      */
     public function handle(Request $request, Closure $next)
     {
-        $tenant = Helpers::setConnectionTenant($request['tenant_id']);
-
-        try {
-            $request['tenant_id'] = $tenant->host;
-            return $next($request);
-        } catch (\Throwable $th) { 
-            if(json_decode($tenant->content())->error)
-                return response()->json(['error' => json_decode($tenant->content())->error], 401);
-        }
+        $tenant = Helpers::setConnectionTenant('teste#2');
+        #$request['tenant_id']
+        // mudar para method "setDefauyltConnection" no model
+        
+        return !is_null($tenant) ?
+            $next($request->all()) : 
+                response()->json(['error' => 'tenant not found'], 401);
     }
 }
