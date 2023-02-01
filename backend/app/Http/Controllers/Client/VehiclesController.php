@@ -1,28 +1,33 @@
 <?php
 
-namespace App\Http\Controllers\Register;
+namespace App\Http\Controllers\Client;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
-use App\Models\Automobile;
+use App\Models\Client\VehiclesModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class AutomobilesController extends Controller
+class VehiclesController extends Controller
 {
     protected $auto;
     protected $request;
+    protected $tenant;
 
-    public function __construct(Automobile $automobile, Request $request)
+    public function __construct(VehiclesModel $automobile, Request $request, Helpers $helpers)
     {
         return [
             $this->auto = $automobile, 
-            $this->request = $request
+            $this->request = $request,
+            $this->tenant = $helpers,
         ];
     }
 
     public function index()
     {
-        return response()->json($this->auto->all());
+        return response()->json(
+            $this->tenant->setTenant($this->auto)->get()
+        );
     }
 
     public function store()
@@ -43,6 +48,8 @@ class AutomobilesController extends Controller
 
     public function show($param)
     {
+
+
         $auto = DB::table('vehicles')
             ->wherePlate($param)
                 ->first();
