@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware\Auth;
 
+use App\Helpers\Helpers;
 use Closure;
 use Illuminate\Http\Request;
 
@@ -16,6 +17,12 @@ class SetTenantId
      */
     public function handle(Request $request, Closure $next)
     {
-        return $next($request);
+        $tenant = Helpers::setTenantConnection('teste#2');
+        #$request['tenant_id']
+        // mudar para method "setDefauyltConnection" no model
+        
+        return !is_null($tenant) ?
+            $next($request->all()) : 
+                response()->json(['error' => 'tenant not found'], 401);
     }
 }

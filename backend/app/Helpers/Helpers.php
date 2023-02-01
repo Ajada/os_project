@@ -11,9 +11,9 @@ class Helpers extends TenantConnection
         return self::reconnect($tenant);
     }
 
-    public function setTenant()
+    public static function setTenant($model)
     {
-        return ;
+        return $model->setTable(self::$host . $model->table);
     }
 
 }

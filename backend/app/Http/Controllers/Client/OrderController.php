@@ -28,6 +28,7 @@ class OrderController extends Controller
 
     public function tes()
     {
+        dd('teste');
         $tes = auth()->attempt();
     }
 
