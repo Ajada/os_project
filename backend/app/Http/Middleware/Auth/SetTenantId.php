@@ -22,7 +22,7 @@ class SetTenantId
         // mudar para method "setDefauyltConnection" no model
         
         return !is_null($tenant) ?
-            $next($request->all()) : 
+            $next($request) : 
                 response()->json(['error' => 'tenant not found'], 401);
     }
 }

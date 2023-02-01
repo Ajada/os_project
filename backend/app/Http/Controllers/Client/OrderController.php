@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use App\Http\Controllers\Client\ServiceController;
 use App\Http\Controllers\Client\PartsController;
-use Symfony\Component\Mailer\Transport\Dsn;
+use App\Helpers\Helpers;
 
 class OrderController extends Controller
 {
@@ -15,20 +15,22 @@ class OrderController extends Controller
     protected $request;
     protected $service;
     protected $parts;
+    protected $tenant;
 
-    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts)
+    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts, Helpers $tenant)
     {
         return [
             $this->order = $order, 
             $this->request = $request,
             $this->service = $service,
             $this->parts = $parts,
+            $this->tenant = $tenant,
         ];
     }
 
     public function tes()
     {
-        dd('teste');
+        dd($this->tenant->setTenant($this->order));
         $tes = auth()->attempt();
     }
 
