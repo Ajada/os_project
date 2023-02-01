@@ -34,13 +34,17 @@ class RouteServiceProvider extends ServiceProvider
                 ->group(base_path('routes/api.php'));
 
             Route::middleware('api')
+                ->prefix('manager')
+                ->group(base_path('routes/app/manager/api.php'));
+
+            Route::middleware('api')
                 ->prefix('app')
-                ->middleware('cors', 'jwt.auth')
+                ->middleware('cors', 'jwt.verify', 'tenant.id', 'set.tenant')
                 ->group(base_path('routes/client/orders/api.php'));
 
             Route::middleware('api')
                 ->prefix('app')
-                ->middleware('cors', 'jwt.auth')
+                ->middleware('cors', 'jwt.verify', 'tenant.id', 'set.tenant')
                 ->group(base_path('routes/client/vehicles/api.php'));
 
             Route::middleware('web')

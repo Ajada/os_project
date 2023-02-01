@@ -26,7 +26,7 @@ class OrderController extends Controller
         ];
     }
 
-    public function tes() 
+    public function tes()
     {
         $tes = auth()->attempt();
     }

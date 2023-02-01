@@ -13,8 +13,9 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::table('responsibles', function (Blueprint $table) {
-            $table->uuid('login_id')->after('id');
+        Schema::table('history_vehicle_io', function (Blueprint $table) {
+            $table->string('date')->after('vehicle_id');
+            $table->string('type')->after('date');
         });
     }
 
@@ -25,8 +26,9 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::table('responsibles', function (Blueprint $table) {
-            $table->dropColumn('login_id');
+        Schema::table('history_vehicle_io', function (Blueprint $table) {
+            $table->dropColumn('date');
+            $table->dropColumn('type');
         });
     }
 };

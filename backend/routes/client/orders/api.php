@@ -16,4 +16,6 @@ Route::controller(OrderController::class)
         
         Route::delete('{id}', 'destroy');
         Route::delete('items', 'deleteServiceAndParts');
+
+        Route::get('auth/teste', 'tes');
     });
