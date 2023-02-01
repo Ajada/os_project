@@ -17,9 +17,5 @@ Route::controller(OrderController::class)
         Route::delete('{id}', 'destroy');
         Route::delete('items', 'deleteServiceAndParts');
 
-<<<<<<< HEAD
-        Route::get('auth/teste', 'authTeste');
-=======
         Route::get('auth/teste', 'tes');
->>>>>>> feature_recreate_methods_to_controllers
     });

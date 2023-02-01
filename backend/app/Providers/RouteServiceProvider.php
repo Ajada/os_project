@@ -39,10 +39,6 @@ class RouteServiceProvider extends ServiceProvider
 
             Route::middleware('api')
                 ->prefix('app')
-<<<<<<< HEAD
-=======
-                // ->middleware('cors', 'jwt.verify', 'tenant.id', 'set.tenant')
->>>>>>> feature_recreate_methods_to_controllers
                 ->middleware('cors', 'jwt.verify', 'tenant.id', 'set.tenant')
                 ->group(base_path('routes/client/orders/api.php'));
 

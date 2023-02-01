@@ -17,7 +17,7 @@ class SetTenantId
      */
     public function handle(Request $request, Closure $next)
     {
-        $tenant = Helpers::setTenantConnection('teste#2');
+        $tenant = Helpers::setTenantConnection($request['tenant_id']);
         #$request['tenant_id']
         // mudar para method "setDefauyltConnection" no model
         
