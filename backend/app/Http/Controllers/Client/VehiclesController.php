@@ -4,157 +4,80 @@ namespace App\Http\Controllers\Client;
 
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
-use App\Models\Client\VehicleModel;
+use App\Models\Client\VehiclesModel;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 class VehiclesController extends Controller
 {
     protected $auto;
-    protected $tenant;
     protected $request;
+    protected $tenant;
 
-    public function __construct(Request $request, VehicleModel $auto, Helpers $helper)
+    public function __construct(VehiclesModel $automobile, Request $request, Helpers $helpers)
     {
         return [
+            $this->auto = $automobile, 
             $this->request = $request,
-            $this->auto = $auto,
-            $this->tenant = $helper,
+            $this->tenant = $helpers,
         ];
     }
 
     public function index()
     {
-        $vehicles = $this->tenant
-            ->setTable($this->auto->table)
-                ->get($this->auto->fillable);
-
-        return !empty($vehicles) ? 
-                response()->json($vehicles) : 
-                    response()->json($vehicles, 204);
+        return response()->json(
+            $this->tenant->setTenant($this->auto)->get()
+        );
     }
 
     public function store()
     {
-        $tes = $this->tenant
-            ->setTable($this->auto->table)
-                ->wherePlate($this->request->plate)
-                    ->first(); 
-
-        dd($tes);
-
         try {
-            return $this->checkVehicleExists($this->request->plate) ? response()->json([
-                'error' => 'record already exists'
-            ], 409) : '';
+            if(json_decode($this->show($this->request->plate)->content())->{'id'})
+                return response()->json([
+                    'error' => 'record already exists'
+                ]);
         } catch (\Throwable $th) {
-            //throw $th;
-            dd('erro');
+            $th = $th; 
         }
 
-        $this->checkVehicleExists($this->request->plate) ? dd('ja existe') : '';
-        
-        $create = $this->tenant->setTable($this->auto->table)->insert($this->request->all());
-
-        return $create ? response()->json(['success']) : response()->json(['error']);
-
-        // dd($this->checkVehicleExists($this->request->plate));
-        return $this->checkVehicleExists($this->request->plate) ? dd('in') : dd('out');
-
-        if(!$this->checkVehicleExists($this->request->plate)->id)
-            return response()->json(['error']);
-        
-        dd('pass');
-
-        dd($this->checkVehicleExists($this->request->plate)->id);
-        
-        if(json_decode($this->show($this->request->plate)->data())->{'id'}){
-            return response()->json([
-                'error' => 'record already exists'
-            ], 409);
-        }
-        
-        $this->tenant->setTable($this->auto->table)
-            ->insert($this->request->all());
-        return response()->json(['success' => $this->request->model.' registered with success'], 201);
-
-        try {
-            if(!json_decode($this->show($this->request->plate)->content())->{'id'})
-                $this->tenant->setTable($this->auto->table)
-                    ->insert($this->request->all());
-            return response()->json(['success' => $this->request->model.' registered with success'], 201);
-        } catch (\Throwable $th) {
-            dd($th);
-            return response()->json([
-                'error' => 'record already exists'
-            ], 409);
-        }
+        return $this->auto::create($this->request->all()) ? 
+            response()->json(['success' => $this->request->model.' registered with success']) : 
+            response()->json(['error' => 'something went wrong creating record']);
     }
 
     public function show($param)
     {
-        // $auto = $this->tenant
-        //     ->setTenant($this->auto)
-        //         ::wherePlate($param)
-        //             ->get($this->auto->fillable)
-        //                 ->first();
 
-        // dd($this->tenant->setTenant($this->auto));
 
-        $tes = $this->auto::wherePlate($param)->first();
-
-        // $tes = DB::table('client_2.vehicles')->wherePlate($param)->get()->first();
-
-        // $tes = $this->auto::collection();
-
-        // dd($tes);
-
-        return $tes ? 
-            response()->json($tes) : 
-                response()->json(['error' => 'no record found'], 409);
-
-        return $auto ? $auto : 'er';
-
-        return $auto ? 
-            response()->json($auto) : 
-                response()->json(['error' => 'no record found'], 409);
-    }
-
-    public function checkVehicleExists($param)
-    {
-        $auto = $this->tenant
-        ->setTable($this->auto->table)
+        $auto = DB::table('vehicles')
             ->wherePlate($param)
                 ->first();
-
-        return $auto->id;
+        return $auto ? response()->json($auto) : response()->json(['error' => 'no record found']);
     }
 
     public function update($id)
     {
         try {
-            if($this->tenant->setTable($this->auto->table)->whereId($id)->get()[0])
+            if($this->auto::whereId($id)->get()[0])
                 foreach ($this->request->all() as $key => $value) {
                     if(!is_null($value))
-                        $this->tenant->setTable('.vehicles')
-                            ->whereId($id)
-                                ->update([$key => $value]);
+                        $this->auto::whereId($id)->update([$key => $value]);
                 }
-            return response()->json([
-                'success' => 'items updated successfully'
-            ], 205);
+            return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
-            return response()->json([
-                'error' => 'no automobile found with these parameters'
-            ], 409);
+            return response()->json(['error' => 'no automobile found with these parameters']);
         }
     }
 
     public function destroy($id)
     {
-        return $this->tenant->setTable($this->auto->table)->whereId($id)->delete() ? 
-            response()->json(['success' => 'record was been deleted successfully'], 200) : 
-                response()->json(['error' => 'error deleting item'], 409);
+        // return $this->tenant->setTable($this->auto->table)->whereId($id)->delete() ? 
+        //     response()->json(['success' => 'record was been deleted successfully'], 200) : 
+        //         response()->json(['error' => 'error deleting item'], 409);
+
+        return $this->auto::whereId($id)->delete() ? 
+            response()->json(['success' => 'record was been deleted successfully']) : 
+            response()->json(['error' => 'error deleting item']);
     }
 }

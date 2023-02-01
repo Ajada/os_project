@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Client\OrderModel;
 use App\Http\Controllers\Client\ServiceController;
 use App\Http\Controllers\Client\PartsController;
+use App\Helpers\Helpers;
 
 class OrderController extends Controller
 {
@@ -14,26 +15,23 @@ class OrderController extends Controller
     protected $request;
     protected $service;
     protected $parts;
-    protected $public;
+    protected $tenant;
 
-    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts)
+    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts, Helpers $tenant)
     {
         return [
             $this->order = $order,
             $this->request = $request,
             $this->service = $service,
             $this->parts = $parts,
+            $this->tenant = $tenant,
         ];
     }
-    
-    protected function setTable()
+
+    public function tes()
     {
-        return $this->order->table = $this->request->tenant_id.'.'.$this->order->table;
-    }
-    
-    public function authTeste() 
-    {
-        dd($this->setTable());
+        dd($this->tenant->setTenant($this->order));
+        $tes = auth()->attempt();
     }
 
     public function index()

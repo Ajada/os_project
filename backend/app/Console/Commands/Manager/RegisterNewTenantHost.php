@@ -4,7 +4,7 @@ namespace App\Console\Commands\Manager;
 
 use Illuminate\Console\Command;
 
-class RegisterNewTenant extends Command
+class RegisterNewTenantHost extends Command
 {
     /**
      * The name and signature of the console command.

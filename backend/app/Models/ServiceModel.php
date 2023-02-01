@@ -13,9 +13,9 @@ class ServiceModel extends Model
     protected $table = 'services';
 
     protected $fillable = [
-        "order_id",
-        "description",
-        "status",
+        'order_id',
+        'description',
+        'status',
     ];
 
     protected $hidden = [
