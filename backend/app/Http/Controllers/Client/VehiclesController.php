@@ -38,46 +38,48 @@ class VehiclesController extends Controller
                     'error' => 'record already exists'
                 ]);
         } catch (\Throwable $th) {
-            $th = $th; 
+            $th = $th;
         }
 
-        return $this->auto::create($this->request->all()) ? 
+        $create = $this->auto->create($this->request->all());
+
+        return $create ? 
             response()->json(['success' => $this->request->model.' registered with success']) : 
-            response()->json(['error' => 'something went wrong creating record']);
+                response()->json(['error' => 'something went wrong creating record']);
     }
 
     public function show($param)
     {
-
-
-        $auto = DB::table('vehicles')
-            ->wherePlate($param)
-                ->first();
+        $auto = $this->tenant
+            ->setTenant($this->auto)
+                ->wherePlate($param)
+                    ->first();
+                    
         return $auto ? response()->json($auto) : response()->json(['error' => 'no record found']);
     }
 
     public function update($id)
     {
+        $vehicle = $this->tenant
+            ->setTenant($this->auto)
+                ->whereId($id);
         try {
-            if($this->auto::whereId($id)->get()[0])
+            if($vehicle->get()[0])
                 foreach ($this->request->all() as $key => $value) {
-                    if(!is_null($value))
-                        $this->auto::whereId($id)->update([$key => $value]);
+                    !is_null($value) ? 
+                        $vehicle->update([$key => $value]) : '';
                 }
-            return response()->json(['success' => 'items updated successfully']);
         } catch (\Throwable $th) {
             return response()->json(['error' => 'no automobile found with these parameters']);
         }
+
+        return response()->json(['success' => 'items updated successfull']);
     }
 
     public function destroy($id)
     {
-        // return $this->tenant->setTable($this->auto->table)->whereId($id)->delete() ? 
-        //     response()->json(['success' => 'record was been deleted successfully'], 200) : 
-        //         response()->json(['error' => 'error deleting item'], 409);
-
-        return $this->auto::whereId($id)->delete() ? 
-            response()->json(['success' => 'record was been deleted successfully']) : 
-            response()->json(['error' => 'error deleting item']);
+        return $this->tenant->setTenant($this->auto)->whereId($id)->delete() ? 
+            response()->json(['success' => 'record was been deleted successfully'], 200) : 
+                response()->json(['error' => 'error deleting item'], 409);
     }
 }

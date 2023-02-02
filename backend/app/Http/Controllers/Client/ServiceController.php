@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceModel;
@@ -10,25 +11,28 @@ class ServiceController extends Controller
 {
     protected $service;
     protected $request;
+    protected $tenant;
 
-    public function __construct(ServiceModel $service, Request $request)
+    public function __construct(ServiceModel $service, Request $request, Helpers $helpers)
     {
         return [
             $this->service = $service, 
-            $this->request = $request
+            $this->request = $request,
+            $this->tenant = $helpers,
         ];
     }
 
     public function index($id)
     {
-        return response()->json($this->service->whereOrderId($id)->get());
+        return response()->json($this->tenant->setTenant($this->service)->whereOrderId($id)->get());
     }
 
     public function store($order)
     {
         try {
+            $service = $this->tenant->setTenant($this->service);
             foreach ($order['service'] as $key => $value) {
-                $this->service->create([
+                $service->create([
                     'order_id' => $order['order_id'] ,
                     'description' => $value['description'],
                     'status' => $value['status']
@@ -42,11 +46,11 @@ class ServiceController extends Controller
 
     public function show($id)
     {
-        $service = $this->service::whereOrderId($id)->get();
-
+        $service = $this->tenant->setTenant($this->service)->whereOrderId($id)->get();
+        
         return isset($service[0]) ?
             response()->json($service) : 
-            response()->json(['There are no registered services for this vehicle.']);
+                response()->json(['There are no registered services for this vehicle.']);
     }
 
     public function update($service)

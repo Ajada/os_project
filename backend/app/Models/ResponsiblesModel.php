@@ -9,7 +9,7 @@ class ResponsiblesModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'responsibles';
+    protected $table = '.responsibles';
 
     protected $fillable = [
         'login_id',

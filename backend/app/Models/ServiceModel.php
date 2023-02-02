@@ -10,7 +10,7 @@ class ServiceModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'services';
+    public $table = '.services';
 
     protected $fillable = [
         'order_id',

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Client;
 
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Client\PartsModel;
 use Illuminate\Http\Request;
@@ -12,25 +13,28 @@ class PartsController extends Controller
 {
     protected $parts;
     protected $request;
+    protected $tenant;
 
-    public function __construct(PartsModel $parts, Request $request)
+    public function __construct(PartsModel $parts, Request $request, Helpers $helpers)
     {
         return [
             $this->parts = $parts,
-            $this->request = $request
+            $this->request = $request,
+            $this->tenant = $helpers,
         ];
     }
 
     public function index($id)
     {
-        return response()->json($this->parts->whereOrderId($id)->get());
+        return response()->json($this->tenant->setTenant($this->parts)->whereOrderId($id)->get());
     }
 
     public function store($order)
     {
+        $parts = $this->tenant->setTenant($this->parts);
         try {
             foreach ($order['parts'] as $key => $value) {
-                $this->parts->create([
+                $parts->create([
                     'order_id' => $order['order_id'],
                     'description' => $value['description'],
                     'amount' => $value['amount']
@@ -44,7 +48,7 @@ class PartsController extends Controller
 
     public function show($id)
     {
-        $parts = $this->parts->whereOrderId($id)->get();
+        $parts = $this->tenant->setTenant($this->parts)->whereOrderId($id)->get();
 
         return isset($parts[0]) ?
             response()->json($parts) : 

@@ -17,14 +17,14 @@ class OrderController extends Controller
     protected $parts;
     protected $tenant;
 
-    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts, Helpers $tenant)
+    public function __construct(OrderModel $order, Request $request, ServiceController $service, PartsController $parts, Helpers $helpers)
     {
         return [
             $this->order = $order,
             $this->request = $request,
             $this->service = $service,
             $this->parts = $parts,
-            $this->tenant = $tenant,
+            $this->tenant = $helpers,
         ];
     }
 
@@ -36,15 +36,17 @@ class OrderController extends Controller
 
     public function index()
     {   
-        $this->setTable();
         $order = [];
 
-        foreach ($this->order->all() as $key => $value) {
-            $order[$key] = [
-                'order' => $value,
-                'services' => $this->service->index($value['id'])->original,
-                'parts' => $this->parts->index($value['id'])->original,
-            ];
+        $collection = $this->tenant->setTenant($this->order);
+
+        foreach ($collection->get() as $key => $value) {
+            
+            // $order[$key] = [
+            //     'order' => $value,
+            //     'services' => $this->service->index($value['id'])->original,
+            //     'parts' => $this->parts->index($value['id'])->original,
+            // ];
         }
 
         return !empty($order) ? response()->json($order) : response()->json($order, 204);
@@ -52,22 +54,24 @@ class OrderController extends Controller
 
     public function store()
     {
-        $this->setTable();
         try {
-            $order = $this->order::create($this->request->all());
+            $order = $this->tenant->setTenant($this->order)->create($this->request->all());
 
             $service = $this->service->store([
                 'order_id' => $order->id, 
                 'service' => $this->request->service
             ]);
-
+        
             $parts = $this->parts->store([
                 'order_id' => $order->id, 
                 'parts' => $this->request->parts
             ]);
             
             if(isset(json_decode($service->content())->{'error'}) || isset(json_decode($parts->content())->{'error'}))
-                return response()->json(['success' => 'order created', 'warning' => 'something went wrong adding parts or service'], 206);  
+                return response()->json([
+                    'success' => 'order created', 
+                    'warning' => 'something went wrong adding parts or service'
+                ], 206);  
         } catch (\Throwable $th) {
             return response()->json(['error' => 'vehicle not reported or not found'], 406);
         }
@@ -77,9 +81,13 @@ class OrderController extends Controller
 
     public function addItemToOrder($id)
     {
-        $this->setTable();
+        $order = $this->tenant->setTenant($this->order)->whereId($id)->first();
+
+        if(is_null($order))
+            return response()->json(['error' => 'order does not exists']);
+
         $service = $this->service->store([
-            'order_id' => $id, 
+            'order_id' => $id,
             'service' => $this->request->service
         ]);
     
@@ -90,14 +98,13 @@ class OrderController extends Controller
 
         return !$service || !$parts ? 
             response()->json(['error' => 'something went wrong creating record'], 409) : 
-            response()->json(['success' => 'items added to order'], 201);
+                response()->json(['success' => 'items added to order '.$id], 201);
     }
 
     public function show($id)
     {
-        $this->setTable();
         $order = [
-            'order' => $this->order::whereId($id)->first(),
+            'order' => $this->tenant->setTenant($this->order)->whereId($id)->first(),
             'services' => $this->service->show($id)->original,
             'parts' => $this->parts->show($id)->original,
         ];

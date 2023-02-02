@@ -9,7 +9,7 @@ class ResponsibleServiceModel extends Model
 {
     use HasFactory;
 
-    protected $table = 'responsible_services';
+    protected $table = '.responsible_services';
 
     protected $fillable = [
         'service_id',

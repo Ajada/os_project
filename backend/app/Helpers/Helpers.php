@@ -11,6 +11,10 @@ class Helpers extends TenantConnection
         return self::reconnect($tenant);
     }
 
+    /**
+     * @param Illuminate\Database\Eloquent\Model $model
+     * @return Illuminate\Database\Eloquent\Model
+     */
     public static function setTenant($model)
     {
         return $model->setTable(self::$host . $model->table);
