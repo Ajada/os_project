@@ -6,6 +6,7 @@ use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\ServiceModel;
+use Exception;
 
 class ServiceController extends Controller
 {
@@ -24,7 +25,7 @@ class ServiceController extends Controller
 
     public function index($id)
     {
-        return response()->json($this->tenant->setTenant($this->service)->whereOrderId($id)->get());
+        return response()->json($this->service->whereOrderId($id)->get());
     }
 
     public function store($order)
@@ -53,16 +54,29 @@ class ServiceController extends Controller
                 response()->json(['There are no registered services for this vehicle.']);
     }
 
-    public function update($service)
+    public function update($service) // refatorar
     {
+        $client = $this->tenant->setTenant($this->service);
+        $exeption = [];
         foreach ($service as $key => $value) {
-            $reg = $this->service->whereId($service[$key]['id']);
-            if(isset($reg->first()->id))
+            $reg = $client->whereId($service[$key]['id']);
+            if(isset($reg->first()->id)){
                 $reg->update([
                     'description' => is_null($value['description']) ? $reg->first()->description : $value['description'],
                     'status' => is_null($value['status']) ? $reg->first()->status : $value['status'],
                 ]);
+                $exeption[$key] = [
+                    'status' => 200,
+                    'message' => 'service with id: '.$service[$key]['id'].' updadted successfully'
+                ];
+            }
+            else
+                $exeption[$key] = [
+                    'status' => 404,
+                    'message' => 'service with id: '.$service[$key]['id'].' not found'
+                ];
         }
+        return !empty($exeption) ? $exeption : 'not informed';
     }
 
     public function destroy($id)

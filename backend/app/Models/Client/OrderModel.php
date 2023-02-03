@@ -12,7 +12,7 @@ class OrderModel extends Model
     
     public $table = '.orders';
 
-    protected $fillable = [
+    public $fillable = [
         'vehicle_id',
         'mileage',
         'client_name',

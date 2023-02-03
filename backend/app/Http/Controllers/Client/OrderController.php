@@ -41,12 +41,11 @@ class OrderController extends Controller
         $collection = $this->tenant->setTenant($this->order);
 
         foreach ($collection->get() as $key => $value) {
-            
-            // $order[$key] = [
-            //     'order' => $value,
-            //     'services' => $this->service->index($value['id'])->original,
-            //     'parts' => $this->parts->index($value['id'])->original,
-            // ];
+            $order[$key] = [
+                'order' => $value,
+                'services' => $this->service->index($value['id'])->original,
+                'parts' => $this->parts->index($value['id'])->original,
+            ];
         }
 
         return !empty($order) ? response()->json($order) : response()->json($order, 204);
@@ -114,18 +113,35 @@ class OrderController extends Controller
 
     public function update($id)
     {
-        $this->setTable();
         try {
-            if($this->order::whereId($id)->get()[0])
+            $order = $this->tenant->setTenant($this->order)->whereId($id);
+            if($order->get()[0]){
+                $orderCollection = '';
+                $service = '';
+                $parts = '';
                 foreach ($this->request->all() as $key => $value) {
-                    $key == 'service' ? $this->service->update($value) : '';
-                    $key == 'parts' ? $this->parts->update($value) : '';
-                    $key == 'service' || $key == 'parts' ? '' : 
-                        $this->order::whereId($id)->update([
-                            $key => $value ? $value : $this->order::whereId($id)->get()[0]->$key]);
+                    if($key != 'service' && $key != 'parts'){
+                        $order->update([
+                            $key => $value ? $value : $order->get()[0]->$key
+                        ]);
+                        continue;
+                    }
+                    if($key == 'service'){
+                        $service = $this->service->update($value);
+                        continue;
+                    }
+                    if($key == 'parts'){
+                        $parts = $this->parts->update($value);
+                        continue;
+                    }
                 }
-            return response()->json(['success' => 'items updated successfully'], 200);
-        } catch (\Throwable $th) {
+                return response()->json([
+                    'order' => 'items updated successfully',
+                    'service' => $service,
+                    'parts' => $parts
+                ], 200);
+            }
+        } catch (\Throwable $th) {  
             return response()->json(['error' => 'no order found with these parameters'], 404);
         }
     }

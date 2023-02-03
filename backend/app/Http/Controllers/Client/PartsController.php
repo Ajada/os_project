@@ -57,14 +57,27 @@ class PartsController extends Controller
 
     public function update($parts)
     {
+        $client = $this->tenant->setTenant($this->parts);
+        $exeption = [];
         foreach ($parts as $key => $value) {
-            $par = $this->parts->whereId($parts[$key]['id']);
-            if(isset($par->first()->id))
-                $par->update([
-                    'description' => !$value['description'] ? $par->first()->description : $value['description'],
-                    'amount' => !$value['amount'] ? $par->first()->amount : $value['amount'],
+            $reg = $client->whereId($parts[$key]['id']);
+            if(isset($reg->first()->id)){
+                $reg->update([
+                    'description' => !$value['description'] ? $reg->first()->description : $value['description'],
+                    'amount' => !$value['amount'] ? $reg->first()->amount : $value['amount'],
                 ]);
+                $exeption[$key] = [
+                    'status' => 200,
+                    'message' => 'service with id: '.$parts[$key]['id'].' updadted successfully'
+                ];
+            }
+            else
+                $exeption[$key] = [
+                    'status' => 404,
+                    'message' => 'service with id: '.$parts[$key]['id'].' not found'
+                ];
         }
+        return !empty($exeption) ? $exeption : 'not informed';
     }
 
     public function destroy($id)
