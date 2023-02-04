@@ -57,24 +57,32 @@ class PartsController extends Controller
 
     public function update($parts)
     {
-        $client = $this->tenant->setTenant($this->parts);
         $exeption = [];
         foreach ($parts as $key => $value) {
-            $reg = $client->whereId($parts[$key]['id']);
-            if(isset($reg->first()->id)){
-                $reg->update([
-                    'description' => !$value['description'] ? $reg->first()->description : $value['description'],
-                    'amount' => !$value['amount'] ? $reg->first()->amount : $value['amount'],
-                ]);
-                $exeption[$key] = [
-                    'status' => 200,
-                    'message' => 'service with id: '.$parts[$key]['id'].' updadted successfully'
-                ];
+            if(isset($this->parts->whereId($value['id'])->first()->id)){
+                if($value['description'] != null){
+                    $this->parts->whereId($value['id'])->update([
+                        'description' => $value['description']
+                    ]);
+                    $exeption[$value['id']] = [
+                        'status' => 200,
+                        'message' => 'part with id: '.$value['id'].' updadted successfully'
+                    ];    
+                }
+                if($value['status'] != null){
+                    $this->parts->whereId($value['id'])->update([
+                        'status' => $value['status']
+                    ]);
+                    $exeption[$value['id']] = [
+                        'status' => 200,
+                        'message' => 'part with id: '.$value['id'].' updadted successfully'
+                    ];    
+                }
             }
             else
-                $exeption[$key] = [
+                $exeption[$value['id']] = [
                     'status' => 404,
-                    'message' => 'service with id: '.$parts[$key]['id'].' not found'
+                    'message' => $value['id'] != null ? 'part with id: '.$value['id'].' not found' : 'id not informed'
                 ];
         }
         return !empty($exeption) ? $exeption : 'not informed';

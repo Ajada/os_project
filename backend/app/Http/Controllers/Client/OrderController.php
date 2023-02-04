@@ -114,15 +114,17 @@ class OrderController extends Controller
     public function update($id) 
     {
         try {
-            $order = json_decode($this->show($id)->content())->{'order'}->{'id'};
-            $order = $this->updateOrder($this->request->all($this->order->fillable));
-            $service = $this->service->update($this->request->service);
-            $parts = $this->parts->update($this->request->parts);
+            json_decode($this->show($id)->content())->{'order'}->{'id'};
 
             return response()->json([
-                'order' => $order,
-                'service' => $service,
-                'parts' => $parts
+                'order' => $this->updateOrder(
+                    $this->request->all($this->order->fillable)),
+
+                'service' => $this->service->update(
+                    $this->request->service),
+
+                'parts' => $this->parts->update(
+                    $this->request->parts)
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -130,65 +132,25 @@ class OrderController extends Controller
                 'msg' => $th
             ], 404);
         }
-
-        dd($this->request->all($this->order->fillable));
-
     }
-
+     
     public function updateOrder($order)
     {
-        $client = $this->tenant->setTenant($this->order);
         $exeption = [];
         foreach ($order as $key => $value) {
             if($value == null)
                 continue;
-            $client->update([
+            else{
+                $this->order->update([
                     $key => $value
                 ]);
-            $exeption[$key] = [
-                'status' => 200,
-                'message' => 'service with id: '.$order[$key]['id'].' updadted successfully'
-            ];
+                $exeption[$key] = [
+                    'status' => 200,
+                    'message' => 'order updated successfully'
+                ];
+            }
         }
         return !empty($exeption) ? $exeption : 'not informed';
-            // }
-            // else
-            //     $exeption[$key] = [
-            //         'status' => 404,
-            //         'message' => 'service with id: '.$order[$key]['id'].' not found'
-            //     ];
-        // return !empty($exeption) ? $exeption : 'not informed';
-        // try {
-        //     $order = $this->tenant->setTenant($this->order)->whereId($id);
-        //     if($order->get()[0]){
-        //         $orderCollection = '';
-        //         $service = '';
-        //         $parts = '';
-        //         foreach ($this->request->all() as $key => $value) {
-        //             if($key != 'service' && $key != 'parts'){
-        //                 $order->update([
-        //                     $key => $value ? $value : $order->get()[0]->$key
-        //                 ]);
-        //                 continue;
-        //             }
-        //             if($key == 'service'){
-        //                 $service = $this->service->update($value);
-        //                 continue;
-        //             }
-        //             if($key == 'parts'){
-        //                 $parts = $this->parts->update($value);
-        //                 continue;
-        //             }
-        //         }
-        //         return response()->json([
-        //             'order' => 'items updated successfully',
-        //             'service' => $service,
-        //             'parts' => $parts
-        //         ], 200);
-        //     }
-        // } catch (\Throwable $th) {  
-        //     return response()->json(['error' => 'no order found with these parameters'], 404);
-        // }
     }
 
     public function destroy($id)

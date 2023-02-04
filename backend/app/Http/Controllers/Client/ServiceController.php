@@ -56,26 +56,36 @@ class ServiceController extends Controller
 
     public function update($service) // refatorar
     {
-        $client = $this->tenant->setTenant($this->service);
         $exeption = [];
+
         foreach ($service as $key => $value) {
-            $reg = $client->whereId($service[$key]['id']);
-            if(isset($reg->first()->id)){
-                $reg->update([
-                    'description' => is_null($value['description']) ? $reg->first()->description : $value['description'],
-                    'status' => is_null($value['status']) ? $reg->first()->status : $value['status'],
-                ]);
-                $exeption[$key] = [
-                    'status' => 200,
-                    'message' => 'service with id: '.$service[$key]['id'].' updadted successfully'
-                ];
+            if(isset($this->service->whereId($value['id'])->first()->id)){
+                if($value['description'] != null){
+                    $this->service->whereId($value['id'])->update([
+                        'description' => $value['description']
+                    ]);
+                    $exeption[$value['id']] = [
+                        'status' => 200,
+                        'message' => 'service with id: '.$value['id'].' updadted successfully'
+                    ];
+                }
+                if($value['status'] != null){
+                    $this->service->whereId($value['id'])->update([
+                        'status' => $value['status']
+                    ]);
+                    $exeption[$value['id']] = [
+                        'status' => 200,
+                        'message' => 'service with id: '.$value['id'].' updadted successfully'
+                    ];    
+                }
             }
             else
-                $exeption[$key] = [
+                $exeption[$value['id']] = [
                     'status' => 404,
-                    'message' => 'service with id: '.$service[$key]['id'].' not found'
+                    'message' => $value['id'] != null ? 'service with id: '.$value['id'].' not found' : 'id not informed'
                 ];
         }
+
         return !empty($exeption) ? $exeption : 'not informed';
     }
 
