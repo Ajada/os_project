@@ -14,8 +14,8 @@ Route::controller(OrderController::class)
         
         Route::put('{id}', 'update');
         
-        Route::delete('{id}', 'destroy');
         Route::delete('items', 'deleteServiceAndParts');
+        Route::delete('{id}', 'destroy');
 
         Route::get('auth/teste', 'tes');
     });

@@ -25,7 +25,11 @@ class ServiceController extends Controller
 
     public function index($id)
     {
-        return response()->json($this->service->whereOrderId($id)->get());
+        $this->service->setTable('.services');
+
+        $service = $this->tenant->setTenant($this->service)->whereOrderId($id)->get();
+
+        return $service; 
     }
 
     public function store($order)
@@ -57,7 +61,6 @@ class ServiceController extends Controller
     public function update($service) // refatorar
     {
         $exeption = [];
-
         foreach ($service as $key => $value) {
             if(isset($this->service->whereId($value['id'])->first()->id)){
                 if($value['description'] != null){
@@ -82,25 +85,49 @@ class ServiceController extends Controller
             else
                 $exeption[$value['id']] = [
                     'status' => 404,
-                    'message' => $value['id'] != null ? 'service with id: '.$value['id'].' not found' : 'id not informed'
+                    'message' => !is_null($value['id']) ? 'service with id: '.$value['id'].' not found' : 'id not informed'
                 ];
         }
 
-        return !empty($exeption) ? $exeption : 'not informed';
+        return !empty($exeption) ? $exeption : 'no reported content';
     }
 
     public function destroy($id)
     {
-        return $this->service::whereOrderId($id)->delete() ? 
+        return $this->tenant->setTenant($this->service)->whereOrderId($id)->delete() ? 
             response()->json(['success' => 'record was been deleted successfull']) : 
             response()->json(['error' => 'error deleting item']);
     }
 
     public function destroyOneService($serviceId)
     {
+        $service = $this->tenant->setTenant($this->service);
+        $exception = [];
+
         foreach ($serviceId as $key => $value) {
-            $this->service::whereId($value['id'])->delete();
+            if($service->whereId($value['id'])->first())
+                $service->whereId($value['id'])->delete() ? 
+                $exception[$key] = [
+                    'status' => 200,
+                    'message' => 'id: '.$value['id'].' deleted successfully'
+                ] : 
+                $exception[$key] = [
+                    'status' => 404,
+                    'message' => $value['id'].' not found'
+                ];
+            else
+                !is_null($value['id']) ?
+                    $exception[$key] = [
+                        'status' => 404,
+                        'message' => 'id: '.$value['id'].' not exists'
+                    ] : 
+                    $exception[$key] = [
+                        'status' => 400,
+                        'message' => 'id not informed' 
+                    ];
         }
+
+        return !empty($exception) ? $exception : 'no reported content';
     }
 
 }

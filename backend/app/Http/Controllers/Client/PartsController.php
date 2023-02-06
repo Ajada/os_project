@@ -26,7 +26,11 @@ class PartsController extends Controller
 
     public function index($id)
     {
-        return response()->json($this->tenant->setTenant($this->parts)->whereOrderId($id)->get());
+        $this->parts->setTable('.parts');
+
+        $parts = $this->tenant->setTenant($this->parts)->whereOrderId($id)->get();
+
+        return $parts;
     }
 
     public function store($order)
@@ -69,36 +73,60 @@ class PartsController extends Controller
                         'message' => 'part with id: '.$value['id'].' updadted successfully'
                     ];    
                 }
-                if($value['status'] != null){
+                if($value['amount'] != null){
                     $this->parts->whereId($value['id'])->update([
                         'status' => $value['status']
                     ]);
                     $exeption[$value['id']] = [
                         'status' => 200,
                         'message' => 'part with id: '.$value['id'].' updadted successfully'
-                    ];    
+                    ];
                 }
             }
             else
-                $exeption[$value['id']] = [
+                $exeption[$key] = [
                     'status' => 404,
                     'message' => $value['id'] != null ? 'part with id: '.$value['id'].' not found' : 'id not informed'
                 ];
         }
-        return !empty($exeption) ? $exeption : 'not informed';
+        return !empty($exeption) ? $exeption : 'no reported content';
     }
 
     public function destroy($id)
     {
-        return $this->parts::whereOrderId($id)->delete() ? 
+        return $this->tenant->setTenant($this->parts)->whereOrderId($id)->delete() ? 
             response()->json(['success' => 'part was been deleted successfully']) : 
             response()->json(['error' => 'error deleting part']);
     }
 
     public function destroyOnePart($partId)
     {
+        $part = $this->tenant->setTenant($this->parts);
+        $exception = [];
+
         foreach ($partId as $key => $value) {
-            $this->parts::whereId($value['id'])->delete();
+            if($part->whereId($value['id'])->first())
+                $part->whereId($value['id'])->delete() ? 
+                $exception[$key] = [
+                    'status' => 200,
+                    'message' => 'id: '.$value['id'].' deleted successfully'
+                ] : 
+                $exception[$key] = [
+                    'status' => 404,
+                    'message' => $value['id'].' not found'
+                ];
+            else
+                !is_null($value['id']) ?
+                    $exception[$key] = [
+                        'status' => 404,
+                        'message' => 'id: '.$value['id'].' not exists'
+                    ] : 
+                    $exception[$key] = [
+                        'status' => 400,
+                        'message' => 'id not informed' 
+                    ];
         }
+
+        return !empty($exception) ? $exception : 'no reported content';
     }
 }

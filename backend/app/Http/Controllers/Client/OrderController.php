@@ -8,6 +8,8 @@ use App\Models\Client\OrderModel;
 use App\Http\Controllers\Client\ServiceController;
 use App\Http\Controllers\Client\PartsController;
 use App\Helpers\Helpers;
+use App\Models\Client\PartsModel;
+use App\Models\ServiceModel;
 
 class OrderController extends Controller
 {
@@ -43,8 +45,8 @@ class OrderController extends Controller
         foreach ($collection->get() as $key => $value) {
             $order[$key] = [
                 'order' => $value,
-                'services' => $this->service->index($value['id'])->original,
-                'parts' => $this->parts->index($value['id'])->original,
+                'services' => $this->service->index($value['id']),
+                'parts' => $this->parts->index($value['id']),
             ];
         }
 
@@ -150,29 +152,29 @@ class OrderController extends Controller
                 ];
             }
         }
-        return !empty($exeption) ? $exeption : 'not informed';
+        return !empty($exeption) ? $exeption : 'no reported content';
     }
 
     public function destroy($id)
     {
-        $this->setTable();
-        if(!$this->order->whereId($id)->first())
+        $order = $this->tenant->setTenant($this->order)->whereId($id);
+
+        if(!$order->first())
             return response()->json(['error' => 'record not found'], 404);
         
         $this->service->destroy($id);
         $this->parts->destroy($id);
-        $this->order::whereId($id)->delete();
+        $order->delete();
 
         return response()->json(['success' => 'record was been deleted successfully'], 200);
     }
 
     public function deleteServiceAndParts()
     {
-        $this->setTable();
-        return $this->service->destroyOneService($this->request->all()['service']) &&
-            $this->service->destroyOnePart($this->request->all()['parts']) ?
-                response()->json(['success' => 'items deleted with successfully'], 200) : 
-                response()->json(['error' => 'something went wrong while removing items'], 409);
+        return response()->json([
+            'service' => $this->service->destroyOneService($this->request->service),
+            'parts' => $this->parts->destroyOnePart($this->request->parts),
+        ]);
     }
 
 }
