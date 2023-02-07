@@ -11,7 +11,7 @@ class RegisterNewTenantHost extends Command
      *
      * @var string
      */
-    protected $signature = 'command:name';
+    protected $signature = 'schema';
 
     /**
      * The console command description.

@@ -110,7 +110,7 @@ class ServiceController extends Controller
                 $exception[$key] = [
                     'status' => 200,
                     'message' => 'id: '.$value['id'].' deleted successfully'
-                ] : 
+                ] :
                 $exception[$key] = [
                     'status' => 404,
                     'message' => $value['id'].' not found'

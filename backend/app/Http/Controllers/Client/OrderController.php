@@ -30,27 +30,21 @@ class OrderController extends Controller
         ];
     }
 
-    public function tes()
-    {
-        dd($this->tenant->setTenant($this->order));
-        $tes = auth()->attempt();
-    }
-
     public function index()
     {   
-        $order = [];
+        $collection = [];
 
-        $collection = $this->tenant->setTenant($this->order);
+        $order = $this->tenant->setTenant($this->order);
 
-        foreach ($collection->get() as $key => $value) {
-            $order[$key] = [
+        foreach ($order->get() as $key => $value) {
+            $collection[$key] = [
                 'order' => $value,
                 'services' => $this->service->index($value['id']),
                 'parts' => $this->parts->index($value['id']),
             ];
         }
 
-        return !empty($order) ? response()->json($order) : response()->json($order, 204);
+        return !empty($collection) ? response()->json($collection) : response()->json($collection, 204);
     }
 
     public function store()
