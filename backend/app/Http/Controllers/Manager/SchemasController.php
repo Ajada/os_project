@@ -6,11 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 
-<<<<<<< HEAD
-// use Illuminate\Support\Facades\Artisan;
-
-=======
->>>>>>> feature_recreate_methods_to_controllers
 class SchemasController extends Controller
 {
     protected $request;
@@ -27,13 +22,17 @@ class SchemasController extends Controller
         //
     }
 
-<<<<<<< HEAD
-=======
+    public function createHost ()
+    {
+        Artisan::call('schema:host', [
+            'create' => $this->request->create
+        ]);
+    }
+
     /**
      * make new schema in DB
      */
->>>>>>> feature_recreate_methods_to_controllers
-    public function store()
+    public function createSchema ()
     {
         Artisan::call('schema', [
             'create' => $this->request->create, 
@@ -49,17 +48,22 @@ class SchemasController extends Controller
     {
         //
     }
+    
+    public function destroyHost ()
+    {
+        Artisan::call('schema:host', [
+            'delete' => $this->request->delete,
+        ]); 
+    }
 
-<<<<<<< HEAD
-=======
     /**
      * delete schema of the DB
      */
->>>>>>> feature_recreate_methods_to_controllers
-    public function destroy()
+    public function destroySchema ()
     {
         Artisan::call('schema', [
             'delete' => $this->request->delete,
         ]);
     }
+    
 }

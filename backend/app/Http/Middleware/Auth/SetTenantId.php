@@ -17,8 +17,7 @@ class SetTenantId
      */
     public function handle(Request $request, Closure $next)
     {
-        $tenant = Helpers::setTenantConnection('teste#3');
-        #$request['tenant_id']
+        $tenant = Helpers::setTenantConnection($request['tenant_id']);
 
         try {
             if(json_decode($tenant->content())->{'error'})

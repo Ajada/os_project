@@ -12,7 +12,7 @@ class PublicModel extends Model
     protected $table = 'public.hosts';
 
     protected $fillable = [
-        'client_id',
+        'tenant_id',
         'host',
     ];
 

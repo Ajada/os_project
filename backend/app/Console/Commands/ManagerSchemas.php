@@ -6,13 +6,8 @@ use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
-class CreateSchema extends Command
+class ManagerSchemas extends Command
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
     protected $signature = 'schema {create?} {delete?}';
 
     /**
@@ -52,4 +47,3 @@ class CreateSchema extends Command
             }
     }
 }
-

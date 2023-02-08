@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Route;
 Route::controller(SchemasController::class)
     ->prefix('v1/schemas')
     ->group(function () {
-        Route::post('create', 'store');
-        Route::delete('remove', 'destroy');
+        Route::post('schema', 'createSchema');
+        Route::post('host', 'createHost');
+        
+        Route::delete('schema', 'destroySchema');
+        Route::delete('host', 'destroyHost');
     });
